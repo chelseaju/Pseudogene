@@ -1,0 +1,18 @@
+1. File Download
+	> human_68.pseudogene
+	> human_71.pseudogene
+
+2. Extract Pseudogene Information
+	> python pseudogene_pseudo_parser.py -i human_71.pseudogene -o human71
+
+3. Retrieve Parent Information
+	> python pseudogene_parent_retriever.py -i human71_parents.txt -o human71
+
+4. Retrieve Parent Sequence
+	> bedtools getfasta -name -split -s -fi ../Homo_sapiens_UCSC/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa -bed human71_parents.bed -fo human71_parents.fa
+
+
+
+This approach is abandoned because the cds for query protein (ensembl protein id) do not include the complete sequence for mRNA (regions before and after coding region). Ensembl REST API does not provide the equivalent transcript id for a given protein id.
+
+

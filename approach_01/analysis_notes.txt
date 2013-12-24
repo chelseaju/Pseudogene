@@ -1,0 +1,2 @@
+The idea is to query ensembl gene id, and retrieve all the possible varients. However, each pseudogene can be directly linked to a ensembl protein.
+
