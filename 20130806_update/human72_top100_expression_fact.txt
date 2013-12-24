@@ -1,0 +1,16 @@
+Genes with Zero Fragment:
+
+pseudo_name pseudo_chr pseudo_strand pseudo_start pseudo_end pseudo_size pseudo_fragment pseudo_fpkm pseudo_primary_fragment pseudo_secondary_fragment parent_name parent_chr parent_strand parent_start parent_end parent_size parent_fragment parent_fpkm parent_primary_fragment parent_secondary_fragment pseudo_type
+38 PGOHUM00000238368 chr10 - 20036100 20036363 264 0 0 0 0 ENSP00000354687_ENST00000361390 chrMT + 3306 4261 956 0 0 0 0 Ambiguous
+67 PGOHUM00000238399 chr10 - 33312300 33312574 275 0 0 0 0 ENSP00000354728_ENST00000361335 chrMT + 10469 10765 297 0 0 0 0 Processed
+72 PGOHUM00000238406 chr10 - 36721790 36723405 1616 0 0 0 0 ENSP00000354813_ENST00000361567 chrMT + 12336 14147 1812 0 0 0 0 Processed
+73 PGOHUM00000238407 chr10 - 36723618 36724101 484 0 0 0 0 ENSP00000354961_ENST00000361381 chrMT + 10759 12136 1378 0 0 0 0 Ambiguous
+75 PGOHUM00000238409 chr10 - 37889723 37890295 573 0 0 0 0 ENSP00000354687_ENST00000361390 chrMT + 3306 4261 956 0 0 0 0 Ambiguous
+85 PGOHUM00000263544 chr10 - 38739582 38740002 421 0 0 0 0 ENSP00000470663_ENST00000599140 chrHG736_PATCH - 56884714 56885556 648 0 0 0 0 Processed
+88 PGOHUM00000238424 chr10 - 39054937 39055092 156 0 0 0 0 ENSP00000354687_ENST00000361390 chrMT + 3306 4261 956 0 0 0 0 Ambiguous
+94 PGOHUM00000262831 chr10 - 42833371 42833687 317 0 0 0 0 ENSP00000456184_ENST00000562085 chrHG730_PATCH - 20506763 20535764 3351 0 0 0 0 Processed
+
+
+
+Fragments Mapped to Both Pseudogene and Parent Genes
+pseudo_name pseudo_chr pseudo_strand pseudo_start pseudo_end pseudo_size pseudo_fragment pseudo_fpkm pseudo_primary_fragment pseudo_secondary_fragment parent_name parent_chr parent_strand parent_start parent_end parent_size parent_fragment parent_fpkm parent_primary_fragment parent_secondary_fragment pseudo_type
