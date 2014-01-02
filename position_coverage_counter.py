@@ -1,6 +1,6 @@
 """ position_coverage_counter
-Usage: python position_coverage_counter.py -c chromosome -i accepted_hit.bam -t threshold -o outputPrefix
-Input: -c chromosome name, -i bam file with mapped reads, -o the directory and prefix of output files
+Usage: python position_coverage_counter.py -c chromosome -i accepted_hit.bam -t threshold -d directory
+Input: -c chromosome name, -d input/output directory -i bam file with mapped reads
 Output: the header line is the chromosome name and size, follow by lines with {position \t readcount \n}
     note: the ouput only report the position with non-zero count   
 Function: 1. convert the bam file to sam file
@@ -78,17 +78,23 @@ def get_chr_name(index):
     after the sorting, create an index file on the sort.bam
 """
         
-def sort_bam_file(bam_file, outputPrefix):
+def sort_bam_file(bam_file, dir):
 
     ## get the file prefix
-    prefix = "accepted_hits"
+    prefix = ""
     prefix_match = re.match(r"(.*).bam", bam_file)
-    if(prefix_match):
+
+    try:
         prefix = prefix_match.group(1)
+    except:
+        print "Existing: Invalid bam file -i %s" %(bam_file)
+        sys.exit(2)
+        
 
     # sort the bam file
-    sort_bam = prefix + "_sorted"
-    pysam.sort(bam_file, sort_bam)
+    bam_input = dir + bam_file
+    sort_bam = dir +  prefix + "_sorted"
+    pysam.sort(bam_input, sort_bam)
     sort_bam = sort_bam + ".bam"
     
     # index the sort bam file
@@ -170,15 +176,19 @@ def main(parser):
     options = parser.parse_args()
     chromosome_name = options.chromosome
     input = options.bamFile
-    output = options.outPrefix
+    dir = options.dir
     threshold = options.threshold
     
+    ## check dir
+    if(dir[-1] != "/"):
+        dir += "/"
+    
     ## start counting the reads
-    sorted_input = sort_bam_file(input, output)
+    sorted_input = sort_bam_file(input, dir)
     counts_array = read_counter(sorted_input, chromosome_name, threshold)
       
     ## output data
-    outfile = output + chromosome_name + "_count.obj"
+    outfile = dir + chromosome_name + "_positionCount.txt"
     output_array(counts_array, chromosome_name, outfile)
 
 
@@ -188,6 +198,6 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--threshold", dest="threshold", type=int, default=0, help="mapQ cutoff [OPTIONAL]")
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-i", "--input", dest="bamFile", type=str, help="bam file name, ex accepted_hit.bam", required = True)
-    parser.add_argument("-o", "--output", dest="outPrefix", type=str, help="prefix or directory of output files", required = True)
+    parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input and output files", required = True)
 
     main(parser)
