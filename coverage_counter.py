@@ -1,5 +1,5 @@
-""" coverage_counter
-Usage: python coverage_counter.py -c chromosome -i accepted_hit.bam -t threshold -o outputPrefix
+""" position_coverage_counter
+Usage: python position_coverage_counter.py -c chromosome -i accepted_hit.bam -t threshold -o outputPrefix
 Input: -c chromosome name, -i bam file with mapped reads, -o the directory and prefix of output files
 Output: the header line is the chromosome name and size, follow by lines with {position \t readcount \n}
     note: the ouput only report the position with non-zero count   
@@ -184,7 +184,7 @@ def main(parser):
 
 if __name__ == "__main__":   
    
-    parser = argparse.ArgumentParser(prog='coverage_counter.py')
+    parser = argparse.ArgumentParser(prog='position_coverage_counter.py')
     parser.add_argument("-t", "--threshold", dest="threshold", type=int, default=0, help="mapQ cutoff [OPTIONAL]")
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-i", "--input", dest="bamFile", type=str, help="bam file name, ex accepted_hit.bam", required = True)
