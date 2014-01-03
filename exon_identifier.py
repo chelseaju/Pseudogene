@@ -120,7 +120,22 @@ def sort_bam_file(bam_file, dir):
     2. traverse the bamfile with a given chromosome name, and obtain the coverage for each position
     3. if the position contains a non-zero coverage, mark the position in the array true
     4. return teh array
+"""   
+def mark_position(bam, chromosome_name):
+
+    chr_size = CHR_SIZE[get_chr_index(chromosome_name)]
+    counts_array = [False]*chr_size
+    
+    samfile = pysam.Samfile( bam, "rb" )
+    
+    for read in samfile.fetch(chromosome_name, 0, chr_size):
+        for pos in read.positions:
+            counts_array[pos] = True
+ 
+    return counts_array
+
 """
+## Pileup approach, which ignores pair end reads that mapped to two different chromosomes
 def pileup_position(bam, chromosome_name):
 
     chr_size = CHR_SIZE[get_chr_index(chromosome_name)]
@@ -128,12 +143,13 @@ def pileup_position(bam, chromosome_name):
     
     samfile = pysam.Samfile( bam, "rb" )
     
-    for pileupcolumn in samfile.pileup(chromosome_name, 0, chr_size):
+    for pileupcolumn in samfile.pileup(chromosome_name, 17152953, 17153061):
         if(pileupcolumn.n > 0):
             counts_array[pileupcolumn.pos] = True
  
     return counts_array
-    
+""" 
+
 """
     Function: traverse the position array. 
             if the position is marked true, the position is covered by read(s).
@@ -151,8 +167,15 @@ def collect_exon(position_array, max_gap):
     
     for i in xrange(len(position_array)):
         if(position_array[i] == True):
+
+            # consecutive positions may have gap as they are not covered by reads
+            # if the gap is less than the given threshold, it's less likely to be an intron
+            # thus, a new exon started with a position that is far apart from the previous position (>= given threshold)            
             if((i - pre_pos) >= max_gap ):
-                if(pre_pos != 0):
+
+                # pre_pos !=0 serves as an indicator to put the valid exon to array
+                # valid exon is considered to have at least 10bp
+                if(pre_pos != 0 and (pre_pos - start_pos + 1) > 10):
                     exons.append((start_pos, pre_pos))
                 
                 start_pos = i
@@ -188,7 +211,8 @@ def main(parser):
     
     ## start counting the reads
     sorted_input = sort_bam_file(input, dir)
-    position_array = pileup_position(sorted_input, chromosome_name)     
+    position_array = mark_position(sorted_input, chromosome_name)     
+#    position_array = pileup_position(sorted_input, chromosome_name)     
 
 
     ## collapse the positions into exons
