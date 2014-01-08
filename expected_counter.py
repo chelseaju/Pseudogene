@@ -1,6 +1,6 @@
 """
-Usage: python expected_counter.py -i accepted_hit.bam -o outputPrefix
-Input: -i bam file with mapped reads, -o the directory and prefix of output files
+Usage: python expected_counter.py -i accepted_hit.bam -d directory
+Input: -i bam file with mapped reads, -d the directory and prefix of output files
 Output: A list of gene with the number of reads. {gene_name \t number_of_read}
 Function: Assuming read with the same prefix (gene name) comes from the same gene.
         The script iterates through the bam file and count expected number of read for each gene.
@@ -15,23 +15,30 @@ import sys, re, pysam, os, random, argparse
     using samtool to sort the bam file by read name
     equivalent to samtool sort -n bam sort.bam
 """
-        
-def sort_bam_file(bam_file, outputPrefix):
+def sort_bam_file(bam_file, dir):
 
     ## get the file prefix
-    prefix = "accepted_hits"
+    prefix = ""
     prefix_match = re.match(r"(.*).bam", bam_file)
-    if(prefix_match):
+
+    try:
         prefix = prefix_match.group(1)
+    except:
+        print "Existing: Invalid bam file -i %s" %(bam_file)
+        sys.exit(2)
+        
 
     # sort the bam file
-    sort_bam = prefix + "_sortedByName"
-    pysam.sort('-n', bam_file, sort_bam)
+    bam_input = dir + bam_file
+    sort_bam = dir +  prefix + "_sortedByName"
+    pysam.sort('-n', bam_input, sort_bam)
     sort_bam = sort_bam + ".bam"
     
     print ""
-    print "Writing Sorted Bam File : %s" %(sort_bam)    
+    print "Writing Sorted Bam File : %s" %(sort_bam)
+     
     return sort_bam
+
 
 """
     iterate through the bam file, which is sorted by the read name
@@ -83,14 +90,18 @@ def main(parser):
     
     options = parser.parse_args()
     input = options.bamFile
-    output = options.outPrefix
+    dir = options.dir
     
-    ## start counting the reads
-    sorted_input = sort_bam_file(input, output)
+    ## check dir
+    if(dir[-1] != "/"):
+        dir += "/"
+
+    ## start counting the readd
+    sorted_input = sort_bam_file(input, dir)
     counts_hash = expected_read_counter(sorted_input)
       
     ## output data
-    outfile = output + "expected_count.txt"
+    outfile = dir + "expected_read_count.txt"
     output_array(counts_hash, outfile)
 
 
@@ -99,6 +110,6 @@ if __name__ == "__main__":
    
     parser = argparse.ArgumentParser(prog='expected_counter.py')
     parser.add_argument("-i", "--input", dest="bamFile", type=str, help="bam file name, ex accepted_hit.bam", required = True)
-    parser.add_argument("-o", "--output", dest="outPrefix", type=str, help="prefix or directory of output files", required = True)
+    parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
 
     main(parser)

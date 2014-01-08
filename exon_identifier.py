@@ -219,7 +219,12 @@ def main(parser):
     exon_array = collect_exon(position_array, min_intron_size)
 
     ## output data
-    outfile = dir + chromosome_name + "_exons.txt"
+    output_dir = dir + "mapping/"
+
+    if(not os.path.exists(output_dir)):
+        os.mkdir(output_dir)
+        
+    outfile = output_dir + chromosome_name + "_exons.txt"
     export_exon(exon_array, outfile)
 
 
