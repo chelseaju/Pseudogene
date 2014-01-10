@@ -23,15 +23,15 @@ def convert_chromosome_name(name):
     match_chr_X = re.match(r"\D*(x)", name)
     match_chr_Y = re.match(r"\D*(y)", name)
     match_chr_M = re.match(r"\D*(m)", name)
-
+    
     if(match_chr_number):
         return match_chr_number.group(1)
     
     elif(match_chr_X):
-        return match_chr_number.group(1)
+        return "X"
 
     elif(match_chr_Y):
-        return match_chr_number.group(1)
+        return "Y"
 
     elif(match_chr_M):
         return "MT"
