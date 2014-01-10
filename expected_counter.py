@@ -75,13 +75,14 @@ def expected_read_counter(sorted_input):
 """
     write the expected counts to file
 """
-def output_array(hash, outfile):
+def export_array(hash, outfile):
     out_fh = open(outfile, "w")
 
     for k, v in hash.items():
         out_fh.write("%s\t%s\n" %(k,str(v)))
     
     out_fh.close()
+    print ""
     print "Writing Expected Count to File : %s" %(outfile)    
 
         
@@ -102,7 +103,7 @@ def main(parser):
       
     ## output data
     outfile = dir + "expected_read_count.txt"
-    output_array(counts_hash, outfile)
+    export_array(counts_hash, outfile)
 
 
 

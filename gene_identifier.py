@@ -51,6 +51,7 @@ def map_exon_to_gene(input_file, chr):
     mapped_regions = {}
     gene_list = []
     
+    
     ## connect to database
     conn = sqlite3.connect('/home/chelseaju/Database/PseudogeneDB/pseudogene.db')
     
@@ -60,7 +61,7 @@ def map_exon_to_gene(input_file, chr):
     for line in input_fh:
         (start, end) = line.split('\t')
 
-        gene_search = "SELECT t.transcript_id, t.transcript_start, t.transcript_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_transcript as t ON t.transcript_id = m.transcript_id WHERE t.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
+        gene_search = "SELECT t.transcript_id, t.protein_id, t.transcript_start, t.transcript_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_transcript as t ON t.transcript_id = m.transcript_id WHERE t.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
         pseudogene_search = "SELECT p.id, p.start_coordinate, p.stop_coordinate FROM pseudogene as p WHERE p.chromosome_name = '%s' AND p.stop_coordinate > %d AND p.start_coordinate < %d " %(str(chr), int(start), int(end))
 
         c = conn.cursor()      
@@ -68,18 +69,19 @@ def map_exon_to_gene(input_file, chr):
         found = False
         for r in c.fetchall():
             found = True
-            id = r[0] + "::" + str(r[1]) + "::" + str(r[2])
-            if(mapped_regions.has_key(id)):
-                (current_min, current_max) = mapped_regions[id]
-                mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))
-                
-            else:
-                mapped_regions[id] = (int(start), int(end))
+            if(r[1] != ""):
+                id = r[1] + "::" + str(r[2]) + "::" + str(r[3])
+                if(mapped_regions.has_key(id)):
+                    (current_min, current_max) = mapped_regions[id]
+                    mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))
+                    
+                else:
+                    mapped_regions[id] = (int(start), int(end))
         
         # exon doesn't have any mapped gene
         if(not found):
-            id = "hypothetical" + "::" + start + "::" + end
-    
+            id = str(chr) + "_" + start + "_" + end + "::" + start + "::" + end
+     
     input_fh.close()
     conn.close()
 
@@ -95,7 +97,8 @@ def map_exon_to_gene(input_file, chr):
         if(cover_percentage > 0.3):            
             gene_list.append((gene_id, mapped_start, mapped_end))
         else:
-            gene_list.append(("hypothetical", mapped_start, mapped_end))
+            new_id = str(chr) + "_" + str(mapped_start) + "_" + str(mapped_end)
+            gene_list.append((new_id, mapped_start, mapped_end))
     
     return gene_list
 
@@ -109,6 +112,7 @@ def export_genes(gene_list, out_file, chr):
         out_fh.write("%s\t%s\t%d\t%d\n" %(id, chr, int(start), int(end)))
     
     out_fh.close()
+    print ""
     print "Writing Gene List to File : %s" %(out_file)
        
 def main(parser):
@@ -129,7 +133,7 @@ def main(parser):
     output_file = output_dir + chromosome_name + "_genes.txt"
     
     chr = convert_chromosome_name(chromosome_name)
-    mapped_regions = map_exon_to_gene(input_file,chr)
+    mapped_regions = map_exon_to_gene(input_file, chr)
     export_genes(mapped_regions, output_file, chromosome_name)
 
 if __name__ == "__main__":   

@@ -1,10 +1,12 @@
 """
-Usage: python observed_counter.py -i accepted_hit.bam -c chromosome_name -d directory
+Usage: python observed_separator.py -i accepted_hit.bam -c chromosome_name -d directory
 Input: -i bam file with mapped reads, -d the directory and prefix of output files, -c chromosome name
-Output: A list of gene with the number of reads. {gene_name \t number_of_read}
-Function: Scan through the bam file and count the number of unique reads in a given gene region
-       
-Date: 2014-01-07
+Output: a file with three columns {original_gene \t mapped_region \t read_count_of_mapped_region} 
+Function: Similar to observed_counter.py, it gathers all the reads for newly identified gene regions,
+    and splits them according to origin of the reads. The origin is identified by the prefix of read name.
+    Each line in the output file corresponds to one origin and one mapped region, and the same origin may have multiple mapped regions. 
+
+Date: 2014-01-08
 Author: Chelsea Ju
 """
 
@@ -49,12 +51,10 @@ def sort_bam_file(bam_file, dir):
 
 """
     Function: iterate through each gene (from gene_file)
-        and count the number of unique reads that covers this gene region
-        unique gene is defined by the name of the read
+        and separate reads that cover this gene region based on the origin of the reads
 """
-def observed_read_counter(sorted_bam, gene_file):
+def observed_read_separator(sorted_bam, gene_file):
 
-    count_array = []
     distribution_array = []
     gene_fh = open(gene_file, 'rb')
     sorted_bam_fh = pysam.Samfile(sorted_bam)
@@ -62,30 +62,42 @@ def observed_read_counter(sorted_bam, gene_file):
     for gene in gene_fh:
         (id, chr, start, end) = gene.split("\t")
         
-        unique_reads = {}
+        unique_origin = {}
         
         # fetch the read in that region
         for read in sorted_bam_fh.fetch(chr, int(start)-1, int(end)-1): # start and end are 1-based
-            unique_reads[read.qname] = ""
+            name = read.qname
+
+            # extract the origin
+            prefix_match = re.match(r"(.*?):.*", name)
+            if(prefix_match):
+                prefix = prefix_match.group(1)
+                if(unique_origin.has_key(prefix)):
+                    unique_origin[prefix] += 1
+                else:
+                    unique_origin[prefix] = 1
+
+        # copy the information from unique_origin to distribution_array           
+        for k, v in unique_origin.items():
+            distribution_array.append((k, id, v))
         
-        count_array.append((id, len(unique_reads)))
     sorted_bam_fh.close()
     gene_fh.close()
 
-    return count_array
+    return distribution_array
 
 """
-    Write the observed count to file
+    Write the data to file
 """
 def export_array(array, outfile):
     out_fh = open(outfile, "w")
 
-    for (id, count) in array:
-        out_fh.write("%s\t%d\n" %(id, count))
+    for (origin, mapped, count) in array:
+        out_fh.write("%s\t%s\t%d\n" %(origin, mapped, count))
     
     out_fh.close()
     print ""
-    print "Writing Observed Count to File : %s" %(outfile)    
+    print "Writing Read Distribution to File : %s" %(outfile)    
 
 
 def main(parser):
@@ -114,18 +126,18 @@ def main(parser):
     ## input file
     input_gene_file = dir + "mapping/" + chromosome_name + "_genes.txt"
   
-    ## start counting the readd
-    counts_array = observed_read_counter(sorted_input, input_gene_file)
-      
+    ## start counting the read
+    distribution = observed_read_separator(sorted_input, input_gene_file)
+          
     ## output data
-    outfile = dir + "mapping/" + chromosome_name + "_observed.txt"
-    export_array(counts_array, outfile)
+    outfile = dir + "mapping/" + chromosome_name + "_distribution.txt"
+    export_array(distribution, outfile)
 
 
 
 if __name__ == "__main__":   
    
-    parser = argparse.ArgumentParser(prog='observed_counter.py')
+    parser = argparse.ArgumentParser(prog='observed_separator.py')
     parser.add_argument("-i", "--input", dest="bamFile", type=str, help="bam file name, ex accepted_hit.bam", required = True)
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
