@@ -62,7 +62,7 @@ def map_exon_to_gene(input_file, chr):
         (start, end) = line.split('\t')
 
         gene_search = "SELECT t.transcript_id, t.protein_id, t.transcript_start, t.transcript_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_transcript as t ON t.transcript_id = m.transcript_id WHERE t.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
-        pseudogene_search = "SELECT p.id, p.start_coordinate, p.stop_coordinate FROM pseudogene as p WHERE p.chromosome_name = '%s' AND p.stop_coordinate > %d AND p.start_coordinate < %d " %(str(chr), int(start), int(end))
+        pseudogene_search = "SELECT p.id, p.start_coordinate, p.stop_coordinate FROM pseudogene as p WHERE p.chromosome = '%s' AND p.stop_coordinate > %d AND p.start_coordinate < %d " %(str(chr), int(start), int(end))
 
         c = conn.cursor()      
         c.execute(gene_search)
@@ -78,7 +78,24 @@ def map_exon_to_gene(input_file, chr):
                 else:
                     mapped_regions[id] = (int(start), int(end))
         
-        # exon doesn't have any mapped gene
+        # exon doesn't have any mapped parent gene, try the pseudogene        
+        if(not found):
+            c = conn.cursor()
+            c.execute(pseudogene_search)
+            
+            for r in c.fetchall():
+                found = True
+                id = r[0] + "::" + str(r[1]) + "::" + str(r[2])
+                
+                if(mapped_regions.has_key(id)):
+                    (current_min, current_max) = mapped_regions[id]
+                    mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))
+                    
+                else:
+                    mapped_regions[id] = (int(start), int(end))
+
+
+        # exon doesn't have any mapped parent gene nor mapped psuedogene
         if(not found):
             id = str(chr) + "_" + start + "_" + end + "::" + start + "::" + end
      
@@ -91,14 +108,14 @@ def map_exon_to_gene(input_file, chr):
        
        ## a valid mapping requires covering at least 30% of the gene, 
        ## if it is less than 30%, return the exon range as a hypothetical gene
-        cover_length = min(int(gene_end), int(mapped_end)) - max(int(gene_start), int(mapped_start))
-        cover_percentage = float(cover_length) / float((int(gene_end) - int(gene_start)))
+#        cover_length = min(int(gene_end), int(mapped_end)) - max(int(gene_start), int(mapped_start))
+#        cover_percentage = float(cover_length) / float((int(gene_end) - int(gene_start)))
        
-        if(cover_percentage > 0.3):            
-            gene_list.append((gene_id, mapped_start, mapped_end))
-        else:
-            new_id = str(chr) + "_" + str(mapped_start) + "_" + str(mapped_end)
-            gene_list.append((new_id, mapped_start, mapped_end))
+#        if(cover_percentage > 0.3):            
+        gene_list.append((gene_id, mapped_start, mapped_end))
+#        else:
+#            new_id = str(chr) + "_" + str(mapped_start) + "_" + str(mapped_end)
+#            gene_list.append((new_id, mapped_start, mapped_end))
     
     return gene_list
 

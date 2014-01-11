@@ -87,7 +87,7 @@ def construct_export_matrix(input, output):
                 if(ORIGIN_ID.has_key(m_id)):
                     m_id_index = ORIGIN_ID[m_id]
                 else:
-                    m_id_index = m + NEW_ID[m_id]
+                    m_id_index = n + NEW_ID[m_id]
                 
                 data[m_id_index] = m_count
         

@@ -73,13 +73,14 @@ def observed_read_separator(sorted_bam, gene_file):
             if(prefix_match):
                 prefix = prefix_match.group(1)
                 if(unique_origin.has_key(prefix)):
-                    unique_origin[prefix] += 1
+                    tmp_hash = unique_origin[prefix]
+                    tmp_hash[name] = ""
                 else:
-                    unique_origin[prefix] = 1
+                    unique_origin[prefix] = {}
 
         # copy the information from unique_origin to distribution_array           
         for k, v in unique_origin.items():
-            distribution_array.append((k, id, v))
+            distribution_array.append((k, id, len(v)))
         
     sorted_bam_fh.close()
     gene_fh.close()
