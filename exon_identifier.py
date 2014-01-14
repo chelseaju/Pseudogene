@@ -1,15 +1,13 @@
 """ exon_identifier
-Usage: python exon_identifier.py -c chromosome -d directory -m min_intron_size -i bamfile
-Input:  -i bamfile (ex accepted_hits.bam)
-        -c chromosome name
+Usage: python exon_identifier.py -c chromosome -d directory -m min_intron_size
+Input:  -c chromosome name
         -d input/output directory 
         -m minimum intron size, default is 80 as suggested in "Junk in Your Genome: Intron Size and Distribution" 
         (http://sandwalk.blogspot.com/2008/02/junk-in-your-genome-intron-size-and.html)
 Output: lines of exons with {start \t end \n}
-Function: 1. sort and index the bam file
-          2. fetch the bam file for a specific chromosome
-          3. traverse each position to identify the coverage
-          4. collect the exon by collapsing the consecutive positions with non-zero coverage.
+Function: 1. fetch the bam file for a specific chromosome
+          2. traverse each position to identify the coverage
+          3. collect the exon by collapsing the consecutive positions with non-zero coverage.
              however, due to sequencing technology, a few nucleotides may not be covered, and results a small gap in the exon.
              thus, consecutive positions are relaxed to allow gaps smaller than the defined threshold (mininum intron size).
 
@@ -76,43 +74,6 @@ def get_chr_name(index):
     else:
         print ("unknown input %s", str(index))
         sys.exit(2)
-
-
-"""
-    using samtool to sort the bam file
-    equivalent to samtool sort bam sort.bam
-    
-    after the sorting, create an index file on the sort.bam
-"""
-        
-def sort_bam_file(bam_file, dir):
-
-    ## get the file prefix
-    prefix = ""
-    prefix_match = re.match(r"(.*).bam", bam_file)
-
-    try:
-        prefix = prefix_match.group(1)
-    except:
-        print "Existing: Invalid bam file -i %s" %(bam_file)
-        sys.exit(2)
-        
-
-    # sort the bam file
-    bam_input = dir + bam_file
-    sort_bam = dir +  prefix + "_sorted"
-    pysam.sort(bam_input, sort_bam)
-    sort_bam = sort_bam + ".bam"
-    
-    # index the sort bam file
-    pysam.index(sort_bam)
-
-    print ""
-    print "Writing Sorted Bam File : %s" %(sort_bam)
-    print "Writing Index Sorted Bam File : %s.bai" %(sort_bam)
-    
-    return sort_bam
-
 
 """
     Function:
@@ -201,7 +162,6 @@ def main(parser):
     
     options = parser.parse_args()
     chromosome_name = options.chromosome
-    input = options.bamfile
     dir = options.dir
     min_intron_size = options.intronsize
     
@@ -210,7 +170,7 @@ def main(parser):
         dir += "/"
     
     ## start counting the reads
-    sorted_input = sort_bam_file(input, dir)
+    sorted_input = dir + "accepted_hits_sorted.bam"
     position_array = mark_position(sorted_input, chromosome_name)     
 #    position_array = pileup_position(sorted_input, chromosome_name)     
 
@@ -231,7 +191,6 @@ def main(parser):
 if __name__ == "__main__":   
    
     parser = argparse.ArgumentParser(prog='exon_identifier.py')
-    parser.add_argument("-i", "--input", dest="bamfile", type=str, help="bam file name, ex accepted_hit.bam", required = True)
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input and output files", required = True)
     parser.add_argument("-m", "--min_intron", dest="intronsize", type=int, default=80, help="minimum intron size [OPTIONAL]")
