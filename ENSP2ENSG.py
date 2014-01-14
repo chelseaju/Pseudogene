@@ -53,7 +53,7 @@ def convert_ids(infile, outfile):
     outfh.close()
     
     print ""
-    print "Writing Gene List to File : %s" %(outfile)
+    print "Writing Conversion to File : %s" %(outfile)
             
             
 def main(parser):
