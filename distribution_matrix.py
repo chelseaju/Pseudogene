@@ -1,7 +1,7 @@
 """
-Usage: python distribution_matrix.py -d directory
-Input: -d the working directory 
-Output: distribution.matrix
+Usage: python distribution_matrix.py -d directory -t dataType
+Input: -d the working directory  -t dataType[genes or transcripts]
+Output: genes_distribution.matrix or transcripts_distribution.matrix
 Function: Reformat the data from distribution.eqn to matix
 
 Author: Chelsea Ju
@@ -106,17 +106,18 @@ def main(parser):
     
     options = parser.parse_args()
     dir = options.dir
+    dataType = options.data_type
     
     ## check dir
     if(dir[-1] != "/"):
         dir += "/"
 
     # distribution equation file
-    input_file = dir + "distribution.eqn"
+    input_file = dir + dataType + "_distribution.eqn"
     retrieve_ID(input_file)
     
     # output the matrix to file
-    output_file = dir + "distribution.matrix"
+    output_file = dir + dataType + "_distribution.matrix"
     construct_export_matrix(input_file, output_file)
     
     
@@ -125,5 +126,6 @@ if __name__ == "__main__":
    
     parser = argparse.ArgumentParser(prog='distribution_matrix.py')
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
+    parser.add_argument("-t", "--dataType", dest="data_type", type=str, help="genes or transcripts", required = True)
 
     main(parser)

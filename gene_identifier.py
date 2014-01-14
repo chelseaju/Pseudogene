@@ -13,6 +13,11 @@ Author: Chelsea Ju
 import sys, re, os, random, argparse, sqlite3
 import sqlite3
 
+
+#DB = '/u/home/c/chelseaj/database/PseudogeneDB/pseudogene.db'
+DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
+
+
 """
     make the chromosome name readable for database
 """
@@ -53,7 +58,7 @@ def map_exon_to_gene(input_file, chr):
     
     
     ## connect to database
-    conn = sqlite3.connect('/home/chelseaju/Database/PseudogeneDB/pseudogene.db')
+    conn = sqlite3.connect(DB)
     
     ## read file
     input_fh = open(input_file, 'rb')
@@ -61,7 +66,7 @@ def map_exon_to_gene(input_file, chr):
     for line in input_fh:
         (start, end) = line.split('\t')
 
-        gene_search = "SELECT t.transcript_id, t.protein_id, t.transcript_start, t.transcript_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_transcript as t ON t.transcript_id = m.transcript_id WHERE t.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
+        gene_search = "SELECT g.gene_id, g.gene_start, g.gene_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_gene as g ON g.gene_id = m.gene_id WHERE g.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
         pseudogene_search = "SELECT p.id, p.start_coordinate, p.stop_coordinate FROM pseudogene as p WHERE p.chromosome = '%s' AND p.stop_coordinate > %d AND p.start_coordinate < %d " %(str(chr), int(start), int(end))
 
         c = conn.cursor()      
@@ -69,30 +74,28 @@ def map_exon_to_gene(input_file, chr):
         found = False
         for r in c.fetchall():
             found = True
-            if(r[1] != ""):
-                id = r[1] + "::" + str(r[2]) + "::" + str(r[3])
-                if(mapped_regions.has_key(id)):
-                    (current_min, current_max) = mapped_regions[id]
-                    mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))
+            id = r[0] + "::" + str(r[1]) + "::" + str(r[2])
+            if(mapped_regions.has_key(id)):
+                (current_min, current_max) = mapped_regions[id]
+                mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))
                     
-                else:
-                    mapped_regions[id] = (int(start), int(end))
+            else:
+                mapped_regions[id] = (int(start), int(end))
         
-        # exon doesn't have any mapped parent gene, try the pseudogene        
-        if(not found):
-            c = conn.cursor()
-            c.execute(pseudogene_search)
+        # try the pseudogene        
+        c = conn.cursor()
+        c.execute(pseudogene_search)
+        
+        for r in c.fetchall():
+            found = True
+            id = r[0] + "::" + str(r[1]) + "::" + str(r[2])
             
-            for r in c.fetchall():
-                found = True
-                id = r[0] + "::" + str(r[1]) + "::" + str(r[2])
+            if(mapped_regions.has_key(id)):
+                (current_min, current_max) = mapped_regions[id]
+                mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))
                 
-                if(mapped_regions.has_key(id)):
-                    (current_min, current_max) = mapped_regions[id]
-                    mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))
-                    
-                else:
-                    mapped_regions[id] = (int(start), int(end))
+            else:
+                mapped_regions[id] = (int(start), int(end))
 
 
         # exon doesn't have any mapped parent gene nor mapped psuedogene

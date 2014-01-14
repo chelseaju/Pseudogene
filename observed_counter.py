@@ -1,13 +1,12 @@
 """
-Usage: python observed_counter.py -i accepted_hit.bam -c chromosome_name -d directory
-Input: -i bam file with mapped reads, -d the directory and prefix of output files, -c chromosome name
-Output: A list of gene with the number of reads. {gene_name \t number_of_read}
-Function: Scan through the bam file and count the number of unique reads in a given gene region
+Usage: python observed_counter.py -i accepted_hit.bam -c chromosome_name -d directory -t dataType
+Input: -i bam file with mapped reads, -d the directory and prefix of output files, -c chromosome name -t dataType[genes or transcripts]
+Output: A list of gene (or transcript) with the number of reads. {name \t number_of_read}
+Function: Scan through the bam file and count the number of unique reads in a given region
        
 Date: 2014-01-07
 Author: Chelsea Ju
 """
-
 
 import sys, re, pysam, os, random, argparse
 
@@ -94,6 +93,7 @@ def main(parser):
     chromosome_name = options.chromosome
     input = options.bamFile
     dir = options.dir
+    dataType = options.data_type
     
     ## check dir
     if(dir[-1] != "/"):
@@ -112,13 +112,13 @@ def main(parser):
     sorted_input = sort_bam_file(input, dir)
 
     ## input file
-    input_gene_file = dir + "mapping/" + chromosome_name + "_genes.txt"
+    input_gene_file = dir + "mapping/" + chromosome_name + "_" + dataType + ".txt"    
   
-    ## start counting the readd
+    ## start counting the read
     counts_array = observed_read_counter(sorted_input, input_gene_file)
       
     ## output data
-    outfile = dir + "mapping/" + chromosome_name + "_observed.txt"
+    outfile = dir + "mapping/" + chromosome_name + "_" + dataType + "_observed.txt"
     export_array(counts_array, outfile)
 
 
@@ -129,5 +129,6 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--input", dest="bamFile", type=str, help="bam file name, ex accepted_hit.bam", required = True)
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
+    parser.add_argument("-t", "--dataType", dest="data_type", type=str, help="genes or transcripts", required = True)
 
     main(parser)
