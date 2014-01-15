@@ -63,6 +63,7 @@ def construct_export_matrix(input, output):
 
     i = 0
     for k in sorted(NEW_ID, key = NEW_ID.get):
+        i = i+1
         if(i < m):
             out_fh.write("%s\t" %(k))
         else:
