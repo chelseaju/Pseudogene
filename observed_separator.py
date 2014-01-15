@@ -30,7 +30,6 @@ def observed_read_separator(sorted_bam, gene_file):
         # fetch the read in that region
         for read in sorted_bam_fh.fetch(chr, int(start)-1, int(end)-1): # start and end are 1-based
             name = read.qname
-
             # extract the origin
             prefix_match = re.match(r"(.*?):.*", name)
             if(prefix_match):
@@ -39,10 +38,13 @@ def observed_read_separator(sorted_bam, gene_file):
                     tmp_hash = unique_origin[prefix]
                     tmp_hash[name] = ""
                 else:
-                    unique_origin[prefix] = {}
+                    tmp_hash = {}
+                    tmp_hash[name] = ""
+                    unique_origin[prefix] = tmp_hash
 
         # copy the information from unique_origin to distribution_array           
         for k, v in unique_origin.items():
+            print k, id, len(v)
             distribution_array.append((k, id, len(v)))
         
     sorted_bam_fh.close()
