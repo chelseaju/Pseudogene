@@ -4,7 +4,7 @@
 # Usage: R --no-save < lasso_analysis.R --args dir type                   #
 # Arguments: input =  directory for input and output                      #
 #            type = genes or transcripts                                  #
-#            output = lasso_coefficient.txt                               #
+#            output = type_lasso_coefficient.txt                          #
 # Author: Chelsea Ju                                                      #
 # Date: 2014-01-14                                                        #
 # Modify from lasso_analysis.R                                            #
@@ -82,15 +82,15 @@ D <- diag(1, ncol(x));
 x_colname <- colnames(x);
 x[is.na(x)] <- 0;
 
-out <- genlasso(y, X=as.matrix(x), D=D);
+out <- genlasso(y[,1], X=as.matrix(x), D=D);
 summary(out);
 
 beta <- coef(out, lambda=sqrt(nrow(x) * log(ncol(x))));
 beta_value <- beta$beta;
-rowname(beta_value) <- x_colname;
+rownames(beta_value) <- x_colname;
 
-filename = paste(dir, "lass_coefficient.xls", sep="/");
+filename = paste(dir, "/", type, "_lasso_coefficient.xls", sep="");
 write.table(paste("lambda", sqrt(nrow(x) * log(ncol(x))), sep="\t"), file=filename);
-write.table(beta_value[order(beta_value),], file=filename, append = T);
+write.table(beta_value[order(beta_value),], file=filename, append = T, quote = FALSE);
 
-
+print(paste("Written the Coefficient to ", filename, sep=""));

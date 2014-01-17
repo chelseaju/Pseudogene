@@ -1,5 +1,5 @@
 """ position_coverage_counter
-Usage: python position_coverage_counter.py -c chromosome -i accepted_hit.bam -t threshold -d directory
+Usage: python position_coverage_counter.py -c chromosome -i accepted_hit.bam -t threshold -d dir
 Input: -c chromosome name, -d input/output directory -i bam file with mapped reads
 Output: the header line is the chromosome name and size, follow by lines with {position \t readcount \n}
     note: the ouput only report the position with non-zero count   

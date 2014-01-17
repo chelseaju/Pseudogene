@@ -44,7 +44,6 @@ def observed_read_separator(sorted_bam, gene_file):
 
         # copy the information from unique_origin to distribution_array           
         for k, v in unique_origin.items():
-            print k, id, len(v)
             distribution_array.append((k, id, len(v)))
         
     sorted_bam_fh.close()
