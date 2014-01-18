@@ -27,7 +27,7 @@ def retrieve_ID(input):
     m = 0
     input_fh = open(input, 'rb')    
     for line in input_fh:
-        line = line.strip()
+        line = line.rstrip()
         (lhs, rhs) = line.split(" =")
         
         # LHS

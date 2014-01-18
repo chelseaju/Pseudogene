@@ -62,6 +62,9 @@ def map_exon_to_gene(input_file, chr):
     ## read file
     input_fh = open(input_file, 'rb')
 
+    ## unknown count
+    unknown= 1
+
     for line in input_fh:
         (start, end) = line.split('\t')
 
@@ -101,7 +104,9 @@ def map_exon_to_gene(input_file, chr):
 
         # exon doesn't have any mapped parent gene nor mapped psuedogene
         if(not found):
-            id = str(chr) + "_" + start + "_" + end + "::" + start + "::" + end
+            id = "Unknown_" + chr +"_"+ str(unknown)
+            unknown += 1 
+            gene_list.append((id, int(start), int(end)))
      
     input_fh.close()
     conn.close()

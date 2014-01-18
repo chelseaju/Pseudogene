@@ -56,14 +56,17 @@ def map_exon_to_gene(input_file, chr):
     mapped_regions = {}
     gene_list = []
     
-    
     ## connect to database
     conn = sqlite3.connect(DB)
     
     ## read file
     input_fh = open(input_file, 'rb')
+    
+    ## unknown count
+    unknown= 1
 
     for line in input_fh:
+        line = line.rstrip()
         (start, end) = line.split('\t')
 
         gene_search = "SELECT g.gene_id, g.gene_start, g.gene_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_gene as g ON g.gene_id = m.gene_id WHERE g.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
@@ -99,9 +102,11 @@ def map_exon_to_gene(input_file, chr):
 
 
         # exon doesn't have any mapped parent gene nor mapped psuedogene
-        if(not found):
-            id = str(chr) + "_" + start + "_" + end + "::" + start + "::" + end
-     
+        if(not found):           
+            id = "Unknown_" + chr +"_"+ str(unknown)
+            unknown += 1 
+            gene_list.append((id, int(start), int(end)))
+            
     input_fh.close()
     conn.close()
 
@@ -119,6 +124,7 @@ def map_exon_to_gene(input_file, chr):
 #        else:
 #            new_id = str(chr) + "_" + str(mapped_start) + "_" + str(mapped_end)
 #            gene_list.append((new_id, mapped_start, mapped_end))
+
     
     return gene_list
 

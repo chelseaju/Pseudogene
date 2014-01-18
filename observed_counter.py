@@ -23,6 +23,7 @@ def observed_read_counter(sorted_bam, gene_file):
     sorted_bam_fh = pysam.Samfile(sorted_bam)
     
     for gene in gene_fh:
+        gene = gene.rstrip()
         (id, chr, start, end) = gene.split("\t")
         
         unique_reads = {}
