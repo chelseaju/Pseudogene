@@ -63,6 +63,8 @@ def map_exon_to_gene(input_file, chr):
     input_fh = open(input_file, 'rb')
 
     for line in input_fh:
+        line = line.rstrip()
+
         (start, end) = line.split('\t')
 
         gene_search = "SELECT t.transcript_id, t.protein_id, t.transcript_start, t.transcript_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_transcript as t ON t.transcript_id = m.transcript_id WHERE t.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
