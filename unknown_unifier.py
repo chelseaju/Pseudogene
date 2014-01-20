@@ -113,7 +113,7 @@ def main(parser):
     # output file    
     if(outdir[-1] != "/"):
         outdir += "/"
-    outfile = outdir + "lookup_table.txt"
+    outfile = outdir + dataType + "_lookup.txt"
     export_data(merger, outfile)
 
 
