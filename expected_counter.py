@@ -1,6 +1,6 @@
 """
-Usage: python expected_counter.py -i accepted_hit.bam -d directory
-Input: -i bam file with mapped reads, -d the directory and prefix of output files
+Usage: python expected_counter.py -d directory
+Input: -d the directory and prefix of output files
 Output: A list of gene with the number of reads. {gene_name \t number_of_read}
 Function: Assuming read with the same prefix (gene name) comes from the same gene.
         The script iterates through the bam file and count expected number of read for each gene.
@@ -10,35 +10,6 @@ Note: this script is adopted from fragments_counter
 """
 
 import sys, re, pysam, os, random, argparse
-
-"""
-    using samtool to sort the bam file by read name
-    equivalent to samtool sort -n bam sort.bam
-"""
-def sort_bam_file(bam_file, dir):
-
-    ## get the file prefix
-    prefix = ""
-    prefix_match = re.match(r"(.*).bam", bam_file)
-
-    try:
-        prefix = prefix_match.group(1)
-    except:
-        print "Existing: Invalid bam file -i %s" %(bam_file)
-        sys.exit(2)
-        
-
-    # sort the bam file
-    bam_input = dir + bam_file
-    sort_bam = dir +  prefix + "_sortedByName"
-    pysam.sort('-n', bam_input, sort_bam)
-    sort_bam = sort_bam + ".bam"
-    
-    print ""
-    print "Writing Sorted Bam File : %s" %(sort_bam)
-     
-    return sort_bam
-
 
 """
     iterate through the bam file, which is sorted by the read name
@@ -90,7 +61,6 @@ def export_array(hash, outfile):
 def main(parser):
     
     options = parser.parse_args()
-    input = options.bamFile
     dir = options.dir
     
     ## check dir
@@ -98,11 +68,11 @@ def main(parser):
         dir += "/"
 
     ## start counting the readd
-    sorted_input = sort_bam_file(input, dir)
-    counts_hash = expected_read_counter(sorted_input)
+    sorted_bam = dir + "accepted_hits_sortedByName.bam"
+    counts_hash = expected_read_counter(sorted_bam)
       
     ## output data
-    outfile = dir + "expected_read_count.txt"
+    outfile = dir + "transcripts_expected_read_count.txt"
     export_array(counts_hash, outfile)
 
 
@@ -110,7 +80,6 @@ def main(parser):
 if __name__ == "__main__":   
    
     parser = argparse.ArgumentParser(prog='expected_counter.py')
-    parser.add_argument("-i", "--input", dest="bamFile", type=str, help="bam file name, ex accepted_hit.bam", required = True)
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
 
     main(parser)
