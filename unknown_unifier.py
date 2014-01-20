@@ -56,7 +56,7 @@ def merge_ids():
             new_name = "Unknown_" + chr + "_" + str(start) + "_" + str(end)
         else:           
             ## overlap region or within 80bp apart
-            if((current_end > start and current_start < end) or (abs(start - current_end) <= 80)):                
+            if((current_end > start and current_start < end) or (abs(start - current_end) <= 80)):
                (unknown, name_chr, name_start, name_end) = new_name.split("_")
                name_start = int(name_start)
                name_end = int(name_end)
@@ -76,6 +76,10 @@ def merge_ids():
         current_chr = chr
         current_start = start
         current_end = end
+
+    # export last one
+    if(len(members) > 1):
+        merger.append((new_name, members))
 
     return merger
 
