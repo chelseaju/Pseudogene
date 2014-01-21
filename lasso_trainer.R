@@ -12,6 +12,8 @@
 
 library(genlasso)
 library(plyr)
+library(glmnet)
+
 
 ## self-defined function
 read_distribution_matrix <- function(subdir, filetype){
@@ -32,7 +34,6 @@ read_expected_data <- function(subdir, filetype, row_order, prefix){
 	rownames(expected_data) <- row_names;
     expected_data <- expected_data[row_order,];
     rownames(expected_data) <- paste(prefix, rownames(expected_data), sep="_")
-	expected_data <- expected_data[-1];
 	expected_data;
 }
 
@@ -40,11 +41,11 @@ read_expected_data <- function(subdir, filetype, row_order, prefix){
 # read in arguments
 options <- commandArgs(trailingOnly = TRUE);
 if(length(options) != 2){
-        stop(paste("Invalid Arguments\n",
-                   "Usage: R--no-save --slave < lasso_trainer.R --args dir type\n",
-                           "\t dir = directory of input and output\n",
-                           "\t type = genes or transcripts\n"),
-                           sep="");
+    stop(paste("Invalid Arguments\n",
+    "Usage: R--no-save --slave < lasso_trainer.R --args dir type\n",
+    "\t dir = directory of input and output\n",
+    "\t type = genes or transcripts\n"),
+    sep="");
 }
 
 dir <- options[1];
@@ -77,20 +78,35 @@ expected_20X50A <- read_expected_data(dir_20X50A, type, rownames(observed_20X50A
 y <- rbind(expected_10X10A, expected_10X30A, expected_10X50A, expected_20X10A, expected_20X30A, expected_20X50A); 
 x <- rbind.fill(observed_10X10A, observed_10X30A, observed_10X50A, observed_20X10A, observed_20X30A, observed_20X50A);
 
-D <- diag(1, ncol(x));
+D <- diag(1, ncol(x), ncol(x));
 
 x_colname <- colnames(x);
 x[is.na(x)] <- 0;
 
-out <- genlasso(y[,1], X=as.matrix(x), D=D);
-summary(out);
+#out <- genlasso(y[,2], X=as.matrix(x), D=D);
+#summary(out);
 
-beta <- coef(out, lambda=sqrt(nrow(x) * log(ncol(x))));
-beta_value <- beta$beta;
-rownames(beta_value) <- x_colname;
+#beta <- coef(out, lambda=sqrt(nrow(x) * log(ncol(x))));
+#beta_value <- beta$beta;
+#rownames(beta_value) <- x_colname;
 
-filename = paste(dir, "/", type, "_lasso_coefficient.xls", sep="");
-write.table(paste("lambda", sqrt(nrow(x) * log(ncol(x))), sep="\t"), file=filename);
-write.table(beta_value[order(beta_value),], file=filename, append = T, quote = FALSE);
+fit <- glmnet(as.matrix(x), y[,2]);
+beta <- as.matrix(coef(fit, s = 0.01));
+
+filename = paste(dir, "/", type, "_lasso_coefficient2.xls", sep="");
+#write.table(paste("lambda", sqrt(nrow(x) * log(ncol(x))), sep="\t"), file=filename);
+#write.table(beta_value[order(beta_value),], file=filename, append = T, quote = FALSE);
+
+write.table(beta, file=filename, quote = FALSE);
 
 print(paste("Written the Coefficient to ", filename, sep=""));
+
+
+
+
+
+
+
+
+
+

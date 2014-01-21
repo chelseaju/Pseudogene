@@ -101,7 +101,7 @@ def map_exon_to_gene(input_file, chr):
         # exon doesn't have any mapped parent gene nor mapped psuedogene
         if(not found):           
             id = "Unknown_" + chr +"_"+ str(start) + "_" + str(end)
-            gene_list.append((id, int(start), int(end)))
+#            gene_list.append((id, int(start), int(end)))
             
     input_fh.close()
     conn.close()

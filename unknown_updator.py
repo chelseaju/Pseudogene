@@ -42,7 +42,7 @@ def find_and_replace(lookup_table, infile):
     fh.close()
     
     print ""
-    print "Unknown IDs Upated: %s" % (infile)
+    print "IDs Upated: %s" % (infile)
         
 def main(parser):
     

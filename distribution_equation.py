@@ -75,7 +75,7 @@ def main(parser):
         dir += "/"
 
     # file for expected count        
-    expected_count_file = dir + "expected_read_count.txt"
+    expected_count_file = dir +  dataType + "_expected_read_count.txt"
     equation_LHS(expected_count_file)
     
     # data directory

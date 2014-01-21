@@ -23,6 +23,13 @@ read_coefficient <- function(file){
     data;
 }
 
+read_coefficient2 <- function(file){
+    data <- read.table(file, skip = 2);
+    colnames(data) <- c("Gene", "Coefficient");
+    rownames(data) <- data$Gene;
+    data;
+}
+
 ## read in the distribution, and expand the matrix based on the trained coefficient
 ## if the column is missing from the coefficient, add a new zero column to the matrix
 read_distribution<- function(file, row_to_expend){
@@ -51,8 +58,8 @@ dir <- options[1];
 subdir <- options[2];
 type <- options[3];
 
-coefficient_file <- paste(dir,"/", type, "_lasso_coefficient.xls", sep="");
-coefficient <- read_coefficient(coefficient_file);
+coefficient_file <- paste(dir,"/", type, "_lasso_coefficient2.xls", sep="");
+coefficient <- read_coefficient2(coefficient_file);
 
 distribution_file <- paste(dir, "/", subdir, "/", type, "_distribution.matrix", sep="");
 distribution <- read_distribution(distribution_file, rownames(coefficient));

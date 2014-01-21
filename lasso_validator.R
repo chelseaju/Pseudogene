@@ -1,6 +1,6 @@
 ################################## lasso_validator.R ###################################
 # Function: Validate the prediction generated from lasso_predictor.R with real data    #
-# Usage: R --no-save < lasso_predictor.R --args dir subdir type                        #
+# Usage: R --no-save < lasso_validator.R --args dir subdir type                        #
 # Arguments: dir =  directory for expected data                                        #
 #           subdir = directory for the prediction and output validation                #
 #     output = type_lasso_validator_v1.txt type_lasso_validator_v2.txt                 # 
