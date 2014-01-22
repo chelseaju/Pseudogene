@@ -2,8 +2,8 @@
 ## sh pre_analysis2.sh reference human72 0.02 100 100 
 DIR=$1
 PREFIX=$2
-GENOME="/u/scratch/c/chelseaj/database/genome.fa"
-GENOMEINDEX="/u/scratch/c/chelseaj/database/Bowtie2Index/genome"
+GENOME="/home/chelseaju/Database/Homo_sapiens_UCSC/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa"
+GENOMEINDEX="/home/chelseaju/Database/Homo_sapiens_UCSC/UCSC/hg19/Sequence/Bowtie2Index/genome"
 ERROR_1="/u/scratch/c/chelseaj/database/SequenceQuality/hiseq_1.fastq"
 ERROR_2="/u/scratch/c/chelseaj/database/SequenceQuality/hiseq_2.fastq"
 #ERROR=$3
@@ -28,7 +28,7 @@ $CMD0a
 #CMD1="dwgsim $DIR/$PREFIX""_parents.fa $DIR/$SUBDIR/$PREFIX -e $ERROR -E $ERROR -d $INSERT -s $INSERTSTD -C $COVERAGE -1 $READLEN -2 $READLEN -r 0 -F 0 -c 0 -R 0 -X 0 -y 0"
 
 
-CMD1="java -Xmx1G -Xms1000m -jar /u/home/c/chelseaj/project/software/RNAseqSim-CJ.jar $SIMCONFIG -GTF_File=$DIR/$PREFIX""_parents.gtf -FASTA_File=$GENOME -Chromosome=chr[0-9XY]* -Chromosome_Matching=Fuzzy -Abundance_File=$DIR/$PREFIX""_parents_abundance_$ABUNDANCE.txt -Abundance_Overwritten=No -Expressed_Transcript_Percentage=1 -SV_Allowed=No -Read_ID_Prefix=ENSP- -Read_Length=$READLEN -Coverage_Factor=$COVERAGE -Quality_Generator=Prefect -Flip_And_Reverse=Yes -Unknown_Factor=0.0001 -Output_Fastq_1=$DIR/$SUBDIR/1.fq -Output_Fastq_2=$DIR/$SUBDIR/2.fq"
+CMD1="RNAseqSim-CJ.jar $SIMCONFIG -GTF_File=$DIR/$PREFIX""_parents.gtf -FASTA_File=$GENOME -Chromosome=chr[0-9XYM]* -Chromosome_Matching=Fuzzy -Abundance_File=$PREFIX""_parents_abundance_$ABUNDANCE.txt -Abundance_Overwritten=No -Expressed_Transcript_Percentage=1 -SV_Allowed=No -Read_ID_Prefix=ENSP- -Read_Length=$READLEN -Coverage_Factor=$COVERAGE -Quality_Generator=Prefect -Flip_And_Reverse=Yes -Unknown_Factor=0.0001 -Output_Fastq_1=$DIR/$SUBDIR/1.fq -Output_Fastq_2=$DIR/$SUBDIR/2.fq"
 
 #CMD1="java -Xmx1G -Xms1000m -jar /u/home/c/chelseaj/project/software/RNAseqSim-CJ.jar $SIMCONFIG -GTF_File=$DIR/$PREFIX""_parents.gtf -FASTA_File=$GENOME -Chromosome=chr[0-9XY]* -Chromosome_Matching=Fuzzy -Abundance_File=$DIR/$PREFIX""_parents_abundance_$ABUNDANCE.txt -Abundance_Overwritten=No -Expressed_Transcript_Percentage=1 -SV_Allowed=No -Read_ID_Prefix=ENSP- -Read_Length=$READLEN -Coverage_Factor=$COVERAGE -Quality_Generator=Real -Real_Quality_Score_Fastq_1=$ERROR_1 -Real_Quality_Score_Fastq_2=$ERROR_2 -Flip_And_Reverse=Yes -Unknown_Factor=0.0001 -Output_Fastq_1=$DIR/$SUBDIR/1.fq -Output_Fastq_2=$DIR/$SUBDIR/2.fq"
 

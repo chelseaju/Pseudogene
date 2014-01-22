@@ -2,8 +2,8 @@
 ## sh analysis_v2.sh reference human72_filter 100 100
 DIR=$1
 PREFIX=$2
-GENOME="/u/scratch/c/chelseaj/database/genome.fa"
-GENOMEINDEX="/u/scratch/c/chelseaj/database/Bowtie2Index/genome"
+GENOME="/home/chelseaju/Database/Homo_sapiens_UCSC/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa"
+GENOMEINDEX="/home/chelseaju/Database/Homo_sapiens_UCSC/UCSC/hg19/Sequence/Bowtie2Index/genome"
 COVERAGE=$3
 READLEN=$4
 ABUNDANCE=$5

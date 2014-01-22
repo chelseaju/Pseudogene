@@ -36,7 +36,7 @@ echo ""
 echo "Step 1: Read Counts For Transcripts"
 
 # expect read count
-#python expected_counter.py -d $DIR/$SUBDIR/$TOPOUT 
+python expected_counter.py -d $DIR/$SUBDIR/$TOPOUT 
 
 for chr in "${CHROMOSOME[@]}"
 do
@@ -58,7 +58,7 @@ echo ""
 echo "Step 2: Read Counts for Genes"
 
 # expect read count
-#python expected_counter.py -d $DIR/$SUBDIR/$TOPOUT
+python expected_counter.py -d $DIR/$SUBDIR/$TOPOUT
 python ENSP2ENSG.py -d $DIR/$SUBDIR/$TOPOUT -i transcripts_expected_read_count.txt -o genes_expected_read_count.txt
 
 for chr in "${CHROMOSOME[@]}"
@@ -70,6 +70,8 @@ do
   python gene_identifier.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python observed_counter.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
   python observed_separator.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
+  python ENSP2ENSG.py -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_genes_distribution.txt -o ${chr}_genes_distribution.txt.new
+  mv $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_genes_distribution.txt.new $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_genes_distribution.txt
 
 done
 
