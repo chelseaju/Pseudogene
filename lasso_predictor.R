@@ -4,10 +4,11 @@
 #   1. take in the matrix X to compute Y                                  #
 #   2. combine the read count for a specific region (mimicing the real    #
 #      scenario), and compute Y                                           #
-# Usage: R --no-save < lasso_predictor.R --args dir subdir type           #
+# Usage: R --no-save < lasso_predictor.R --args dir subdir type laasso    #
 # Arguments: dir =  directory for coefficient                             #
 #           subdir = directory for the predicting file and output         #
 #            type = genes or transcripts                                  #
+#	    lasso = genlasso or glmnet                                    #
 # Output = type_lasso_predictor_v1.txt type_lasso_predictor_v2.txt        #
 # Author: Chelsea Ju                                                      #
 # Date: 2014-01-15                                                        #
@@ -16,15 +17,9 @@
 
 library(plyr)
 
-read_coefficient <- function(file){
-    data <- read.table(file, skip = 3);
-    colnames(data) <- c("Gene", "Coefficient");
-    rownames(data) <- data$Gene;
-    data;
-}
+read_coefficient <- function(file, lasso){
 
-read_coefficient2 <- function(file){
-    data <- read.table(file, skip = 2);
+    ifelse(lasso == "genlasso", data <- read.table(file, skip = 3), data <- read.table(file, skip = 2));
     colnames(data) <- c("Gene", "Coefficient");
     rownames(data) <- data$Gene;
     data;
@@ -42,24 +37,28 @@ read_distribution<- function(file, row_to_expend){
 }
 
 
-
 # read in arguments
 options <- commandArgs(trailingOnly = TRUE);
-if(length(options) != 3){
+if(length(options) != 4){
     stop(paste("Invalid Arguments\n",
-    "Usage: R--no-save --slave < lasso_predictor.R --args dir subdir type\n",
+    "Usage: R--no-save --slave < lasso_predictor.R --args dir subdir type lasso\n",
     "\t dir = directory of coefficient file\n",
     "\t subdir = directory of predicting file and output\n",
-    "\t type = genes or transcripts\n"),
+    "\t type = genes or transcripts\n",
+    "\t lasso = genlasso or glmnet\n"),
     sep="");
 }
 
 dir <- options[1];
 subdir <- options[2];
 type <- options[3];
+lasso <- options[4];
 
-coefficient_file <- paste(dir,"/", type, "_lasso_coefficient2.xls", sep="");
-coefficient <- read_coefficient2(coefficient_file);
+#coefficient_file <- paste(dir,"/", type, "_lasso_coefficient_genlasso.xls", sep="");
+#coefficient <- read_coefficient_genlasso(coefficient_file);
+
+coefficient_file <- paste(dir,"/", type, "_", lasso, "_coefficient.xls", sep="");
+coefficient <- read_coefficient(coefficient_file, lasso);
 
 distribution_file <- paste(dir, "/", subdir, "/", type, "_distribution.matrix", sep="");
 distribution <- read_distribution(distribution_file, rownames(coefficient));
@@ -80,8 +79,8 @@ rownames(predict_y_v2) <- colnames(distribution);
 
 
 ## write to file
-output_v1 <- paste(dir, "/", subdir, "/", type, "_lasso_prediction_v1.txt", sep="");
-output_v2 <- paste(dir, "/", subdir, "/", type, "_lasso_prediction_v2.txt", sep="");
+output_v1 <- paste(dir, "/", subdir, "/", type, "_", lasso, "_prediction_v1.txt", sep="");
+output_v2 <- paste(dir, "/", subdir, "/", type, "_", lasso, "_prediction_v2.txt", sep="");
 
 write.table(predict_y_v1, file = output_v1, sep="\t", col.names = FALSE);
 write.table(predict_y_v2, file = output_v2, sep="\t", col.names = FALSE);

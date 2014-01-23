@@ -28,6 +28,7 @@ def equation_LHS(input):
         (id, count) = line.split("\t")
         if(EQUATION_HASH.has_key(id)):
             EQUATION_HASH[id][0] += int(count)
+            print id
         else:
             EQUATION_HASH[id] = [int(count)]
     

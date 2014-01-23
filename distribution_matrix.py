@@ -10,22 +10,21 @@ Date: 2014-01-09
 import sys, re, os, random, argparse, glob
 
 
-ORIGIN_ID = {} # ID => Index
-NEW_ID = {} 
+IDs = {} # ID => Index
 
 """
     Function: determine the size an ID of the matrix
         matrix size should be N x M, where N is the number of original regions, and M is the number of mapped
         usually M > N
-        It builds ORIGIN_ID and NEW_ID, where keys are the unique ID for original regions and the mapped region respectively,
-            values are the index of the key.
-        For mapped region, the index refers to the dth position after the original regions (ie N + d)            
+        It builds ID, where key is the unique ID for original regions and the mapped region,
+            value is the index of the key.
 """
 def retrieve_ID(input):
 
-    n = 0
-    m = 0
-    input_fh = open(input, 'rb')    
+    index = 0
+    
+    # traverse the file twice, the first time to get the original IDs, second time to get the mapped region
+    input_fh = open(input, 'rb')
     for line in input_fh:
         line = line.rstrip()
         (lhs, rhs) = line.split(" =")
@@ -33,17 +32,24 @@ def retrieve_ID(input):
         # LHS
         (o_count, o_id) = lhs.split(" * ")
         (o_pid, o_tid) = o_id.split("_")
-        ORIGIN_ID[o_pid] = n
-        n += 1
-        
+        if(not IDs.has_key(o_pid)):
+            IDs[o_pid] = index
+            index += 1
+
+    # go back to the beginning of the file
+    input_fh.seek(0)   
+    for line in input_fh:
+        line = line.rstrip()
+        (lhs, rhs) = line.split(" =")
+                
         # RHS
         for element in rhs.split(" +"):
             # ignore the empty RHS
             if(len(element) > 0):
                 (m_count, m_id) = element.split(" * ")
-                if(not ORIGIN_ID.has_key(m_id) and not NEW_ID.has_key(m_id)):
-                    NEW_ID[m_id] = m 
-                    m += 1
+                if(not IDs.has_key(m_id)):
+                    IDs[m_id] = index
+                    index += 1
     input_fh.close()
 
 """
@@ -53,27 +59,17 @@ def construct_export_matrix(input, output):
     
     in_fh = open(input, 'rb')
     out_fh = open(output, 'w')
-    
-    n = len(ORIGIN_ID)
-    m = len(NEW_ID)
-
+        
     # print column name to file first
-    for k in sorted(ORIGIN_ID, key=ORIGIN_ID.get):
+    for k in sorted(IDs, key=IDs.get):
         out_fh.write("%s\t" %(k))
-
-    i = 0
-    for k in sorted(NEW_ID, key = NEW_ID.get):
-        i = i+1
-        if(i < m):
-            out_fh.write("%s\t" %(k))
-        else:
-            out_fh.write("%s\n" %(k))
     
+    out_fh.write("\n")
     for line in in_fh:
         line = line.strip()
         (lhs, rhs) = line.split(" =")
         
-        data = [0]*(n+m)
+        data = [0]*(len(IDs))
 
         # LHS
         (o_count, o_id) = lhs.split(" * ")
@@ -85,11 +81,12 @@ def construct_export_matrix(input, output):
             if(len(element) > 0):
                 (m_count, m_id) = element.split(" * ")
                 m_count = m_count.strip(" ")
-                if(ORIGIN_ID.has_key(m_id)):
-                    m_id_index = ORIGIN_ID[m_id]
+                if(IDs.has_key(m_id)):
+                    m_id_index = IDs[m_id]
                 else:
-                    m_id_index = n + NEW_ID[m_id]
-                
+                    print "ID %s not found " %(m_id)
+                    exit()
+                    
                 data[m_id_index] = m_count
         
         out_fh.write("%s\t" %(o_pid))

@@ -83,23 +83,26 @@ D <- diag(1, ncol(x), ncol(x));
 x_colname <- colnames(x);
 x[is.na(x)] <- 0;
 
-#out <- genlasso(y[,2], X=as.matrix(x), D=D);
-#summary(out);
+out <- genlasso(y[,2], X=as.matrix(x), D=D);
+summary(out);
 
-#beta <- coef(out, lambda=sqrt(nrow(x) * log(ncol(x))));
-#beta_value <- beta$beta;
-#rownames(beta_value) <- x_colname;
+beta <- coef(out, lambda=sqrt(nrow(x) * log(ncol(x))));
+beta_value <- beta$beta;
+rownames(beta_value) <- x_colname;
 
 fit <- glmnet(as.matrix(x), y[,2]);
 beta <- as.matrix(coef(fit, s = 0.01));
 
-filename = paste(dir, "/", type, "_lasso_coefficient2.xls", sep="");
-#write.table(paste("lambda", sqrt(nrow(x) * log(ncol(x))), sep="\t"), file=filename);
-#write.table(beta_value[order(beta_value),], file=filename, append = T, quote = FALSE);
+filename_genlasso = paste(dir, "/", type, "_genlasso_coefficient.xls", sep="");
+filename_glmnet = paste(dir, "/", type, "_glmnet_coefficient.xls", sep="");
 
-write.table(beta, file=filename, quote = FALSE);
+write.table(paste("lambda", sqrt(nrow(x) * log(ncol(x))), sep="\t"), file=filename_genlasso);
+write.table(beta_value[order(beta_value),], file=filename_genlasso, append = T, quote = FALSE);
+print(paste("Written the Coefficient to ", filename_genlasso, sep=""));
 
-print(paste("Written the Coefficient to ", filename, sep=""));
+write.table(beta, file=filename_glmnet, quote = FALSE);
+
+print(paste("Written the Coefficient to ", filename_glmnet, sep=""));
 
 
 
