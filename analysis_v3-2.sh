@@ -81,21 +81,21 @@ R --no-save --slave < lasso_trainer.R --args $DIR genes
 echo ""
 echo "Step 3: Lasso Prediction"
 R --no-save --slave < lasso_predictor.R --args $DIR $X30A10/$TOPOUT genes glmnet
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A30/$TOPOUT genes glmnet
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A50/$TOPOUT genes glmnet
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A10/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A30/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A50/$TOPOUT genes genlasso
+R --no-save --slave < lasso_predictor.R --args $DIR $X30A30/$TOPOUT genes glmnet
+R --no-save --slave < lasso_predictor.R --args $DIR $X30A50/$TOPOUT genes glmnet
+R --no-save --slave < lasso_predictor.R --args $DIR $X30A10/$TOPOUT genes genlasso
+R --no-save --slave < lasso_predictor.R --args $DIR $X30A30/$TOPOUT genes genlasso
+R --no-save --slave < lasso_predictor.R --args $DIR $X30A50/$TOPOUT genes genlasso
 
 
 echo ""
 echo "Step 4: Lasso Validation"
 R --no-save --slave < lasso_validator.R --args $DIR $X30A10/$TOPOUT genes glmnet
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A30/$TOPOUT genes glmnet
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A50/$TOPOUT genes glmnet
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A10/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A30/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A50/$TOPOUT genes genlasso
+R --no-save --slave < lasso_validator.R --args $DIR $X30A30/$TOPOUT genes glmnet
+R --no-save --slave < lasso_validator.R --args $DIR $X30A50/$TOPOUT genes glmnet
+R --no-save --slave < lasso_validator.R --args $DIR $X30A10/$TOPOUT genes genlasso
+R --no-save --slave < lasso_validator.R --args $DIR $X30A30/$TOPOUT genes genlasso
+R --no-save --slave < lasso_validator.R --args $DIR $X30A50/$TOPOUT genes genlasso
 
 
 
