@@ -10,10 +10,10 @@ Function: 1. Scan through the file to look for key word ENSPXXXXX
 Date: 2014-01-13
 Author: Chelsea Ju
 """
-import sys, re, os, random, argparse, sqlite3
+import sys, re, os, random, argparse
 import sqlite3
 
-#DB = '/u/home/c/chelseaj/database/PseudogeneDB/pseudogene.db'
+#DB = '/u/scratch/c/chelseaj/database/PseudogeneDB/pseudogene.db'
 DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
 
 
