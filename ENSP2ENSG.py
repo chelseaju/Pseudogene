@@ -14,8 +14,8 @@ import sys, re, os, random, argparse, sqlite3
 import sqlite3
 
 #DB = '/u/home/c/chelseaj/database/PseudogeneDB/pseudogene.db'
-DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
-
+#DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
+DB = 'pseudogene.db'
 
 """
     Function: scan through infile, and change the ENSP keyword to ENSG through retrieving the database
