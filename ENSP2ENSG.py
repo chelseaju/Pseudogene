@@ -10,12 +10,12 @@ Function: 1. Scan through the file to look for key word ENSPXXXXX
 Date: 2014-01-13
 Author: Chelsea Ju
 """
-import sys, re, os, random, argparse
+import sys, re, os, random, argparse, sqlite3
 import sqlite3
 
-#DB = '/u/scratch/c/chelseaj/database/PseudogeneDB/pseudogene.db'
-DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
-
+#DB = '/u/home/c/chelseaj/database/PseudogeneDB/pseudogene.db'
+#DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
+DB = 'pseudogene.db'
 
 """
     Function: scan through infile, and change the ENSP keyword to ENSG through retrieving the database
