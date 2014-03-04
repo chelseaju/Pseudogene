@@ -17,7 +17,7 @@ CHROMOSOME=('chr1' 'chr2' 'chr3' 'chr4' 'chr5' 'chr6' 'chr7' 'chr8'
 #ENST2ESG="/home/chelseaju/Database/EnsemblTranscriptome/Genes/ENST2ENSG.py"
 #ENSG2PGOHUM="/home/chelseaju/Database/EnsemblTranscriptome/Genes/ENSG2PGOHUM.py"
 
-ENST2ESG="/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ENST2ENSG.py"
+ENST2ENSG="/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ENST2ENSG.py"
 ENSG2PGOHUM="/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ENSG2PGOHUM.py"
 
 #CHROMOSOME=('chr1' 'chr2')
