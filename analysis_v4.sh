@@ -59,8 +59,8 @@ do
 done
 
 # observed read distribution
-python distribution_equation.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG_PGOHUM
-python distribution_matrix.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG_PGOHUM
+python distribution_equation.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG
+python distribution_matrix.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG
 
 
 
