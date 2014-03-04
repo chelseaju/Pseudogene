@@ -43,7 +43,7 @@ echo "Step 1: Read Counts for Genes"
 
 # expect read count
 python expected_counter.py -d $DIR/$SUBDIR/$TOPOUT
-python ENST2ENSG -i expected_read_count.txt -o ENSG_expected_read_count.txt -d $DIR/$SUBDIR/$TOPOUT
+python $ENST2ENSG -i expected_read_count.txt -o ENSG_expected_read_count.txt -d $DIR/$SUBDIR/$TOPOUT
 
 for chr in "${CHROMOSOME[@]}"
 do
@@ -53,8 +53,8 @@ do
   python exon_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python gene_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python observed_separator.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
-  python ENSG2PGOHUM -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_genes_distribution.txt -o ${chr}_PGOHUM_distribution.txt
-  python ENST2ENSG -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_PGOHUM_distribution.txt -o ${chr}_ENSG_distribution.txt
+  python python $ENSG2PGOHUM -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_genes_distribution.txt -o ${chr}_PGOHUM_distribution.txt
+  python python $ENST2ENSG -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_PGOHUM_distribution.txt -o ${chr}_ENSG_distribution.txt
 
 done
 
