@@ -54,65 +54,66 @@ def map_exon_to_gene(input_file):
     gene_list = {}
     unknown = []  
     unknown_collapse = []
-    
-    mapping = subprocess.check_output(["bedtools", "intersect", "-wb", "-loj", "-a", input_file, "-b", ENSEMBL_GENE])
-    mapping_data = mapping.split("\n")
-    
-    for m in mapping_data:
-        data = m.split("\t")
-        if(len(data) > 2):
-            mapped_gene_name = data[6]
-            
-            # found mapped gene
-            if(mapped_gene_name != "-1" and mapped_gene_name != "."):
-                if(gene_list.has_key(mapped_gene_name)):
-                    exist_mapped_gene = gene_list[mapped_gene_name]
-                    gene_list[mapped_gene_name] = (exist_mapped_gene[0], exist_mapped_gene[1], min(exist_mapped_gene[2], int(data[1])), max(exist_mapped_gene[2], int(data[2])))
 
-                else:
-                    gene_list[mapped_gene_name] = (int(data[4]), int(data[5]), int(data[1]), int(data[2]))  # (exon_start, exon_end, ensembl_start, ensembl_end)
-            else:
-                unknown.append((data[0], int(data[1]), int(data[2]))) #(chr, exon_start, exon_end)
-
-
-    # remove overlap genes : some genes have overlapped positions. this step is to select the best matched gene
-    previous_gene = (0,0,0,0)  #(name, start, end, coverage)
-    for k in sorted(gene_list.items(), key = lambda x: x[1][0]):
-        coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / (float(k[1][1]) - float(k[1][0]))
-
-        # check for overlap
-        if(k[1][0] >= previous_gene[1] and k[1][0] <= previous_gene[2]):    # since the list is sorted, only check the starting position against previous stored record
-            
-            # replace with best coverage gene
-            if(coverage > previous_gene[3]):
-                previous_gene = (k[0], k[1][0], k[1][1], coverage)
-        else:
-            if(previous_gene[3] > 0.01):   # remove extremely low coverage gene
-                final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
-            previous_gene = (k[0], k[1][0], k[1][1], coverage)
+    if(os.stat(input_file)[6]!=0):
+        mapping = subprocess.check_output(["bedtools", "intersect", "-wb", "-loj", "-a", input_file, "-b", ENSEMBL_GENE])
+        mapping_data = mapping.split("\n")
         
-    # store the last record
-    if(previous_gene[3] > 0.01):
-        final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
-  
- 
-    # collapse unknown region
-    unknwon = sorted(unknown)    
-    if(len(unknown) > 0):
-        unknown_collapse.append(unknwon[0])
+        for m in mapping_data:
+            data = m.split("\t")
+            if(len(data) > 2):
+                mapped_gene_name = data[6]
+                
+                # found mapped gene
+                if(mapped_gene_name != "-1" and mapped_gene_name != "."):
+                    if(gene_list.has_key(mapped_gene_name)):
+                        exist_mapped_gene = gene_list[mapped_gene_name]
+                        gene_list[mapped_gene_name] = (exist_mapped_gene[0], exist_mapped_gene[1], min(exist_mapped_gene[2], int(data[1])), max(exist_mapped_gene[2], int(data[2])))
 
-    for u in unknown:
-        previous = unknown_collapse[-1]
+                    else:
+                        gene_list[mapped_gene_name] = (int(data[4]), int(data[5]), int(data[1]), int(data[2]))  # (exon_start, exon_end, ensembl_start, ensembl_end)
+                else:
+                    unknown.append((data[0], int(data[1]), int(data[2]))) #(chr, exon_start, exon_end)
 
-        # new region if the gap is bigger than 80
-        if(u[1] > previous[2] and (u[1] - previous[2]) > 80):
-            unknown_collapse.append(u)
-        else:
-            unknown_collapse[-1] = (u[0], min(previous[1], u[1]), max(previous[2], u[2]))
- 
-    for u in unknown_collapse:
-        name = "Unknown_" + str(u[0]) + "_" + str(u[1]) + "_" + str(u[2])
-        final_list.append((name, u[1], u[2]))
+
+        # remove overlap genes : some genes have overlapped positions. this step is to select the best matched gene
+        previous_gene = (0,0,0,0)  #(name, start, end, coverage)
+        for k in sorted(gene_list.items(), key = lambda x: x[1][0]):
+            coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / (float(k[1][1]) - float(k[1][0]))
+
+            # check for overlap
+            if(k[1][0] >= previous_gene[1] and k[1][0] <= previous_gene[2]):    # since the list is sorted, only check the starting position against previous stored record
+                
+                # replace with best coverage gene
+                if(coverage > previous_gene[3]):
+                    previous_gene = (k[0], k[1][0], k[1][1], coverage)
+            else:
+                if(previous_gene[3] > 0.01):   # remove extremely low coverage gene
+                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
+                previous_gene = (k[0], k[1][0], k[1][1], coverage)
+            
+        # store the last record
+        if(previous_gene[3] > 0.01):
+            final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
+      
+     
+        # collapse unknown region
+        unknwon = sorted(unknown)    
+        if(len(unknown) > 0):
+            unknown_collapse.append(unknwon[0])
+
+        for u in unknown:
+            previous = unknown_collapse[-1]
+
+            # new region if the gap is bigger than 80
+            if(u[1] > previous[2] and (u[1] - previous[2]) > 80):
+                unknown_collapse.append(u)
+            else:
+                unknown_collapse[-1] = (u[0], min(previous[1], u[1]), max(previous[2], u[2]))
+     
+        for u in unknown_collapse:
+            name = "Unknown_" + str(u[0]) + "_" + str(u[1]) + "_" + str(u[2])
+            final_list.append((name, u[1], u[2]))
             
     return final_list
 

@@ -53,8 +53,8 @@ do
   python exon_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python gene_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python observed_separator.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
-  python python $ENSG2PGOHUM -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_genes_distribution.txt -o ${chr}_PGOHUM_distribution.txt
-  python python $ENST2ENSG -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_PGOHUM_distribution.txt -o ${chr}_ENSG_distribution.txt
+  echo "python $ENSG2PGOHUM -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_genes_distribution.txt -o ${chr}_PGOHUM_distribution.txt"
+  echo "python $ENST2ENSG -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_PGOHUM_distribution.txt -o ${chr}_ENSG_distribution.txt"
 
 done
 
