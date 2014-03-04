@@ -72,7 +72,7 @@ def main(parser):
     counts_hash = expected_read_counter(sorted_bam)
       
     ## output data
-    outfile = dir + "transcripts_expected_read_count.txt"
+    outfile = dir + "expected_read_count.txt"
     export_array(counts_hash, outfile)
 
 

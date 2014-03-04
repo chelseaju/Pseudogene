@@ -16,7 +16,7 @@ import sys, re, pysam, os, random, argparse
     Function: iterate through each gene (from gene_file)
         and separate reads that cover this gene region based on the origin of the reads
 """
-def observed_read_separator(sorted_bam, gene_file):
+def observed_read_separator(sorted_bam, gene_file, chromosome_name):
 
     distribution_array = []
     gene_fh = open(gene_file, 'rb')
@@ -29,7 +29,7 @@ def observed_read_separator(sorted_bam, gene_file):
         unique_origin = {}
         
         # fetch the read in that region
-        for read in sorted_bam_fh.fetch(chr, int(start)-1, int(end)-1): # start and end are 1-based
+        for read in sorted_bam_fh.fetch(chromosome_name, int(start)-1, int(end)-1): # start and end are 1-based
             name = read.qname
             # extract the origin
             prefix_match = re.match(r"(.*?):.*", name)
@@ -83,7 +83,7 @@ def main(parser):
     input_gene_file = dir + "mapping/" + chromosome_name + "_" + dataType + ".txt"    
   
     ## start counting the read
-    distribution = observed_read_separator(sorted_input, input_gene_file)
+    distribution = observed_read_separator(sorted_input, input_gene_file, chromosome_name)
           
     ## output data
     outfile = dir + "mapping/" + chromosome_name + "_" + dataType + "_distribution.txt"

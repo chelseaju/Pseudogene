@@ -12,7 +12,8 @@ Update from gene_identifier.py
 """
 import sys, re, os, subprocess, random, argparse
 
-ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ensemblGene_pseudogene.bed"
+ENSEMBL_GENE = "/home/chelseaju/Database/EnsemblTranscriptome/Genes/ensemblGene_pseudogene.bed"
+#ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ensemblGene_pseudogene.bed"
 #ENSEMBL_GENE = "/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ensemblGene_pseudogene.bed"
 
 """
@@ -48,7 +49,8 @@ def convert_chromosome_name(name):
     
 """
 def map_exon_to_gene(input_file):
-        
+
+    final_list = []        
     gene_list = {}
     unknown = []  
     unknown_collapse = []
@@ -63,38 +65,65 @@ def map_exon_to_gene(input_file):
             
             # found mapped gene
             if(mapped_gene_name != "-1" and mapped_gene_name != "."):
-                gene_list[mapped_gene_name] = (data[3], data[4], data[5])
-            
-            else:
-                unknown.append((data[0], data[1], data[2]))
+                if(gene_list.has_key(mapped_gene_name)):
+                    exist_mapped_gene = gene_list[mapped_gene_name]
+                    gene_list[mapped_gene_name] = (exist_mapped_gene[0], exist_mapped_gene[1], min(exist_mapped_gene[2], int(data[1])), max(exist_mapped_gene[2], int(data[2])))
 
-    # collapse unknwon region
+                else:
+                    gene_list[mapped_gene_name] = (int(data[4]), int(data[5]), int(data[1]), int(data[2]))  # (exon_start, exon_end, ensembl_start, ensembl_end)
+            else:
+                unknown.append((data[0], int(data[1]), int(data[2]))) #(chr, exon_start, exon_end)
+
+
+    # remove overlap genes : some genes have overlapped positions. this step is to select the best matched gene
+    previous_gene = (0,0,0,0)  #(name, start, end, coverage)
+    for k in sorted(gene_list.items(), key = lambda x: x[1][0]):
+        coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / (float(k[1][1]) - float(k[1][0]))
+
+        # check for overlap
+        if(k[1][0] >= previous_gene[1] and k[1][0] <= previous_gene[2]):    # since the list is sorted, only check the starting position against previous stored record
+            
+            # replace with best coverage gene
+            if(coverage > previous_gene[3]):
+                previous_gene = (k[0], k[1][0], k[1][1], coverage)
+        else:
+            if(previous_gene[3] > 0.01):   # remove extremely low coverage gene
+                final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
+            previous_gene = (k[0], k[1][0], k[1][1], coverage)
+        
+    # store the last record
+    if(previous_gene[3] > 0.01):
+        final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
+  
+ 
+    # collapse unknown region
     unknwon = sorted(unknown)    
     if(len(unknown) > 0):
         unknown_collapse.append(unknwon[0])
+
     for u in unknown:
         previous = unknown_collapse[-1]
-        if(int(u[1]) > int(previous[2]) and int(u[1]) - int(previous[2]) > 80):
+
+        # new region if the gap is bigger than 80
+        if(u[1] > previous[2] and (u[1] - previous[2]) > 80):
             unknown_collapse.append(u)
         else:
-            unknown_collapse[-1] = (previous[0], min(previous[1], u[1]), max(previous[2], u[2]))
+            unknown_collapse[-1] = (u[0], min(previous[1], u[1]), max(previous[2], u[2]))
  
     for u in unknown_collapse:
         name = "Unknown_" + str(u[0]) + "_" + str(u[1]) + "_" + str(u[2])
-        gene_list[name] = u
+        final_list.append((name, u[1], u[2]))
             
-    return gene_list
+    return final_list
 
 """
     Function: print the list of gene to file
 """
-def export_genes(gene_list, out_file):
+def export_genes(gene_list, out_file, chromosome_name):
     
     out_fh = open(out_file, 'w')
-    for k in gene_list.keys():
-        (chr, start, end) = gene_list[k]
-        out_fh.write("%s\t%s\t%d\t%d\n" %(k, chr, int(start), int(end)))
-    
+    for (name, start, end) in gene_list:
+        out_fh.write("%s\t%s\t%d\t%d\n" %(name, chromosome_name, int(start), int(end)))    
     out_fh.close()
     print ""
     print "Writing Gene List to File : %s" %(out_file)
@@ -114,11 +143,11 @@ def main(parser):
     
     ## output file
     output_dir = dir + "mapping/"
-    output_file = output_dir + chromosome_name + "_genes.bed"
+    output_file = output_dir + chromosome_name + "_genes.txt"
     
     chr = convert_chromosome_name(chromosome_name)
     mapped_regions = map_exon_to_gene(input_file)
-    export_genes(mapped_regions, output_file)
+    export_genes(mapped_regions, output_file, chromosome_name)
 
 if __name__ == "__main__":   
    

@@ -15,7 +15,7 @@ import sys, re, pysam, os, random, argparse
         and count the number of unique reads that covers this gene region
         unique gene is defined by the name of the read
 """
-def observed_read_counter(sorted_bam, gene_file):
+def observed_read_counter(sorted_bam, gene_file, chromosome_name):
 
     count_array = []
     distribution_array = []
@@ -29,7 +29,7 @@ def observed_read_counter(sorted_bam, gene_file):
         unique_reads = {}
         
         # fetch the read in that region
-        for read in sorted_bam_fh.fetch(chr, int(start)-1, int(end)-1): # start and end are 1-based
+        for read in sorted_bam_fh.fetch(chromosome_name, int(start)-1, int(end)-1): # start and end are 1-based
             unique_reads[read.qname] = ""
         
         count_array.append((id, len(unique_reads)))
@@ -69,7 +69,7 @@ def main(parser):
     input_gene_file = dir + "mapping/" + chromosome_name + "_" + dataType + ".txt"    
   
     ## start counting the read
-    counts_array = observed_read_counter(sorted_input, input_gene_file)
+    counts_array = observed_read_counter(sorted_input, input_gene_file, chromosome_name)
       
     ## output data
     outfile = dir + "mapping/" + chromosome_name + "_" + dataType + "_observed.txt"

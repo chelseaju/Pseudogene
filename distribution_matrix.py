@@ -32,8 +32,8 @@ def retrieve_ID(input):
         # LHS
         (o_count, o_id) = lhs.split(" * ")
         (o_pid, o_tid) = o_id.split("_")
-        if(not IDs.has_key(o_pid)):
-            IDs[o_pid] = index
+        if(not IDs.has_key(o_tid)):
+            IDs[o_tid] = index
             index += 1
 
     # go back to the beginning of the file
@@ -89,7 +89,7 @@ def construct_export_matrix(input, output):
                     
                 data[m_id_index] = m_count
         
-        out_fh.write("%s\t" %(o_pid))
+        out_fh.write("%s\t" %(o_tid))
         out_fh.write("\t".join([str(d) for d in data]))
         out_fh.write("\n")
     

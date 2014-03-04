@@ -13,10 +13,8 @@ Author: Chelsea Ju
 import sys, re, os, random, argparse, sqlite3
 import sqlite3
 
-PSEUDOGENE_DB = '/u/scratch/c/chelseaj/database/PseudogeneDB/pseudogene.db'
-ENSEMBL_DB = '/u/scratch/c/chelseaj/database/EnsemblTranscriptome/ensembl.db'
-#PSEUDOGENE_DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
-#ENSEMBL_DB = '/home/chelseaju/Database/EnsemblTranscriptome/ensembl.db'
+#DB = '/u/home/c/chelseaj/database/PseudogeneDB/pseudogene.db'
+DB = '/home/chelseaju/Database/PseudogeneDB/pseudogene.db'
 
 
 """
@@ -59,8 +57,7 @@ def map_exon_to_gene(input_file, chr):
     
     
     ## connect to database
-    conn = sqlite3.connect(PSEUDOGENE_DB)
-    e_conn = sqlite3.connect(ENSEMBL_DB)
+    conn = sqlite3.connect(DB)
     
     ## read file
     input_fh = open(input_file, 'rb')
@@ -86,22 +83,6 @@ def map_exon_to_gene(input_file, chr):
                     
                 else:
                     mapped_regions[id] = (int(start), int(end))
-
-       # try ensembl database
-        if(not found):           
-            ensembl_search = "SELECT t.transcript_id, e.exon_chr_start, e.exon_chr_end FROM ensembl_exon as e INNER JOIN ensembl_mapping as m ON e.exon_id = m.exon_id INNER JOIN ensembl_transcript as t ON t.transcript_id = m.transcript_id WHERE t.chromosome_name = '%s' AND e.exon_chr_end > %d AND e.exon_chr_start < %d" % (str(chr), int(start), int(end))
-            c2 = e_conn.cursor()      
-            c2.execute(ensembl_search)
-            for r in c2.fetchall():
-                found = True
-                id = r[0] + "::" + str(r[1]) + "::" + str(r[2])
-                if(mapped_regions.has_key(id)):
-                    (current_min, current_max) = mapped_regions[id]
-                    mapped_regions[id] = (min(current_min, int(start)), max(current_max, int(end)))                        
-                else:
-                    mapped_regions[id] = (int(start), int(end))
-
-
         
         # exon doesn't have any mapped parent gene, try the pseudogene        
         if(not found):
