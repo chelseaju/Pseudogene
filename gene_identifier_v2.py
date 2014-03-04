@@ -12,9 +12,9 @@ Update from gene_identifier.py
 """
 import sys, re, os, subprocess, random, argparse
 
-ENSEMBL_GENE = "/home/chelseaju/Database/EnsemblTranscriptome/Genes/ensemblGene_pseudogene.bed"
+#ENSEMBL_GENE = "/home/chelseaju/Database/EnsemblTranscriptome/Genes/ensemblGene_pseudogene.bed"
 #ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ensemblGene_pseudogene.bed"
-#ENSEMBL_GENE = "/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ensemblGene_pseudogene.bed"
+ENSEMBL_GENE = "/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ensemblGene_pseudogene.bed"
 
 """
     make the chromosome name readable for database
