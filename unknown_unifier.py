@@ -13,7 +13,7 @@ Update: 2014-03-05 change to infile editing
 import sys, re, os, random, argparse
 from numpy  import *
 
-IDs = []
+IDs = {}
 
 """
     Function: read in IDs from files
@@ -25,7 +25,7 @@ def parse_id(file):
     for name in line.split("\t"):
         unknown_match = re.match("Unknown_", name)
         if(unknown_match):
-            IDs.append(name)
+            IDs[name] = ""
     fh.close()
 
 
@@ -43,7 +43,7 @@ def merge_ids():
     new_name = ""
     members = []
 
-    for e in sorted(set(IDs)):
+    for e in sorted(IDs.keys()):
         (unknown, chr, start, end) = e.split("_")
         start = int(start)
         end = int(end)
@@ -76,7 +76,7 @@ def merge_ids():
                 members = [e]
                 new_name = "Unknown_" + chr + "_" + str(start) + "_" + str(end)
                     
-                
+        print members, merger        
         ## reset current information            
         current_chr = chr
         current_start = start
@@ -152,8 +152,6 @@ def main(parser):
 
     # merge ids
     merger = merge_ids()
-
-    print ""
 
     for d in dir:
         infile_editing(merger, d)

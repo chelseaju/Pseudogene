@@ -7,6 +7,7 @@
 
 ## bash analysis_v4-2.sh DIR 
 
+
 DIR=$1
 TOPOUT="tophat_out"
 

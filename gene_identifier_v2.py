@@ -16,6 +16,8 @@ import sys, re, os, subprocess, random, argparse
 #ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ensemblGene_pseudogene.bed"
 ENSEMBL_GENE = "/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ensemblGene_pseudogene.bed"
 
+PRIORITY_GENE = {}
+
 """
     make the chromosome name readable for database
 """
@@ -43,10 +45,20 @@ def convert_chromosome_name(name):
         print ("unknown input %s", name)
         sys.exit(2)
   
-
 """
-    Function: map the identified exon to known gene
-    
+    Function: List of gene to be prioritize, serve as selecting overlapped genes
+"""
+def read_priority_gene(filename):
+    fh = open(filename, 'rb')
+
+    for line in fh:
+        (gid, count) = line.split("\t")
+        (ensp, ensg) = gid.split("_")
+        PRIORITY_GENE[ensg] = ""
+
+    fh.close()
+"""
+    Function: map the identified exon to known gene    
 """
 def map_exon_to_gene(input_file):
 
@@ -77,20 +89,27 @@ def map_exon_to_gene(input_file):
 
 
         # remove overlap genes : some genes have overlapped positions. this step is to select the best matched gene
-        previous_gene = (0,0,0,0)  #(name, start, end, coverage)
+        # how to deal with prioritize list
+        previous_gene = (0,0,0,0,0)  #(name, start, end, coverage, prioritize flag)
         for k in sorted(gene_list.items(), key = lambda x: x[1][0]):
             coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / (float(k[1][1]) - float(k[1][0]))
+            priority = PRIORITY_GENE.has_key(k[0])
 
             # check for overlap
             if(k[1][0] >= previous_gene[1] and k[1][0] <= previous_gene[2]):    # since the list is sorted, only check the starting position against previous stored record
                 
+                # select the prioritize gene
+                if(priority and previous_gene[4] == 0):
+                    previous_gene = (k[0], k[1][0], k[1][1], coverage, 1)
+
                 # replace with best coverage gene
-                if(coverage > previous_gene[3]):
-                    previous_gene = (k[0], k[1][0], k[1][1], coverage)
+                elif ((not priority and previous_gene[4] == 0) or (priority and previous_gene[4] == 1)):
+                    if(coverage > previous_gene[3]):
+                        previous_gene = (k[0], k[1][0], k[1][1], coverage, int(priority))
             else:
                 if(previous_gene[3] > 0.01):   # remove extremely low coverage gene
                     final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
-                previous_gene = (k[0], k[1][0], k[1][1], coverage)
+                previous_gene = (k[0], k[1][0], k[1][1], coverage, int(priority))
             
         # store the last record
         if(previous_gene[3] > 0.01):
@@ -147,6 +166,7 @@ def main(parser):
     output_file = output_dir + chromosome_name + "_genes.txt"
     
     chr = convert_chromosome_name(chromosome_name)
+    read_priority_gene(dir + "ENSG_expected_read_count.txt")
     mapped_regions = map_exon_to_gene(input_file)
     export_genes(mapped_regions, output_file, chromosome_name)
 
