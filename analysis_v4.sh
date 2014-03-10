@@ -14,11 +14,11 @@ CHROMOSOME=('chr1' 'chr2' 'chr3' 'chr4' 'chr5' 'chr6' 'chr7' 'chr8'
 	'chr9' 'chr10' 'chr11' 'chr12' 'chr13' 'chr14' 'chr15' 'chr16'
 	'chr17' 'chr18' 'chr19' 'chr20' 'chr21' 'chr22' 'chrX' 'chrY' 'chrM')
 
-#ENST2ESG="/home/chelseaju/Database/EnsemblTranscriptome/Genes/ENST2ENSG.py"
-#ENSG2PGOHUM="/home/chelseaju/Database/EnsemblTranscriptome/Genes/ENSG2PGOHUM.py"
+ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
+ENST2ENSG="/home/chelseaju/Database/Ensembl/script/ENST2ENSG.py"
 
-ENST2ENSG="/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ENST2ENSG.py"
-ENSG2PGOHUM="/u/scratch/c/chelseaj/database/EnsemblTranscriptome/Genes/ENSG2PGOHUM.py"
+#ENST_ENSG_ENSP="/u/home/c/chelseaj/project/atabase/Ensembl/ENST_ENSG_ENSP_74.txt"
+#ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
 
 #CHROMOSOME=('chr1' 'chr2')
 
@@ -43,7 +43,7 @@ echo "Step 1: Read Counts for Genes"
 
 # expect read count
 python expected_counter.py -d $DIR/$SUBDIR/$TOPOUT
-python $ENST2ENSG -i expected_read_count.txt -o ENSG_expected_read_count.txt -d $DIR/$SUBDIR/$TOPOUT
+python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/expected_read_count.txt -o $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt -d $ENST_ENSG_ENSP
 
 for chr in "${CHROMOSOME[@]}"
 do
@@ -53,8 +53,7 @@ do
   python exon_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python gene_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python observed_separator.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
-  python $ENSG2PGOHUM -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_genes_distribution.txt -o ${chr}_PGOHUM_distribution.txt
-  python $ENST2ENSG -d $DIR/$SUBDIR/$TOPOUT/mapping -i ${chr}_PGOHUM_distribution.txt -o ${chr}_ENSG_distribution.txt
+  python $ENST2ENSG -d $ENST_ENSG_ENSP -i $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_genes_distribution.txt -o $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
 
 done
 
