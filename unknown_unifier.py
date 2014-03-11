@@ -75,8 +75,6 @@ def merge_ids():
                 # reset name and members
                 members = [e]
                 new_name = "Unknown_" + chr + "_" + str(start) + "_" + str(end)
-                    
-        print members, merger        
         ## reset current information            
         current_chr = chr
         current_start = start

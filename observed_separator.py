@@ -29,7 +29,7 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
         unique_origin = {}
         
         # fetch the read in that region
-        for read in sorted_bam_fh.fetch(chromosome_name, int(start)-1, int(end)-1): # start and end are 1-based
+        for read in sorted_bam_fh.fetch(chromosome_name, int(start), int(end)): # start and end are 0-based
             name = read.qname
             # extract the origin
             prefix_match = re.match(r"(.*?):.*", name)

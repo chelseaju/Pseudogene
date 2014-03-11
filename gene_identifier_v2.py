@@ -13,13 +13,13 @@ Update from gene_identifier.py
 import sys, re, os, subprocess, random, argparse
 
 
-ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
-PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
-PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
+#ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
+#PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
+#PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
 
-#ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
-#PARENT_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENST_74.bed"
-#PSEUDO_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
+ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
+PARENT_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENST_74.bed"
+PSEUDO_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
 
 
 """
@@ -91,14 +91,14 @@ def map_exon_to_gene(input_file, database):
                 if(coverage > previous_gene[3]):
                     previous_gene = (k[0], k[1][0], k[1][1], coverage)
             else:
-                if(previous_gene[3] > 0.01):   # remove extremely low coverage gene
-                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
+#                if(previous_gene[3] > 0.01):   # remove extremely low coverage gene
+                final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
 
                 previous_gene = (k[0], k[1][0], k[1][1], coverage)
             
         # store the last record
-        if(previous_gene[3] > 0.01):
-            final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
+ #       if(previous_gene[3] > 0.01):
+        final_list.append((previous_gene[0], previous_gene[1], previous_gene[2]))
            
             
     return (final_list, unknown)
@@ -124,7 +124,7 @@ def collapse_unknown_region(unknown):
 
             # export unknown region
             if(unknown_collapse[3] > 0):
-                name = "Unknown_" + str([unknown_collapse][0]) + "_" + str(unknown_collapse[1]) + "_" + str(unknown_collapse[2])
+                name = "Unknown_" + str(unknown_collapse[0]) + "_" + str(unknown_collapse[1]) + "_" + str(unknown_collapse[2])
                 final_list.append((name, unknown_collapse[1], unknown_collapse[2]))
 
             # new region

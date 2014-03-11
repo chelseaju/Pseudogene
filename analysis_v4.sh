@@ -17,7 +17,7 @@ CHROMOSOME=('chr1' 'chr2' 'chr3' 'chr4' 'chr5' 'chr6' 'chr7' 'chr8'
 ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
 ENST2ENSG="/home/chelseaju/Database/Ensembl/script/ENST2ENSG.py"
 
-#ENST_ENSG_ENSP="/u/home/c/chelseaj/project/atabase/Ensembl/ENST_ENSG_ENSP_74.txt"
+#ENST_ENSG_ENSP="/u/home/c/chelseaj/project/database/Ensembl/ENST_ENSG_ENSP_74.txt"
 #ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
 
 #CHROMOSOME=('chr1' 'chr2')
