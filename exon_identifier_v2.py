@@ -150,11 +150,9 @@ def collect_exon(position_array, max_gap):
 """
 def export_exon(exon_array, chromosome_name, outfile):
 
-    chr_name = chromosome_name[3:]
-
     outfh = open(outfile, "w")
     for e in exon_array:
-        outfh.write("%s\t%d\t%d\n" %(chr_name, e[0]+1, e[1]+1)) # the position in e is 0-based
+        outfh.write("%s\t%d\t%d\n" %(chromosome_name, e[0]+1, e[1]+1)) # the position in e is 0-based
 
     outfh.close()
     print "Writing Exon List to File : %s" %(outfile)
