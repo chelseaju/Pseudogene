@@ -40,13 +40,13 @@ java -Xmx1G -Xms1000m -jar /u/home/c/chelseaj/project/software/RNAseqSim-CJ.jar 
 ## Step 2: Mapping the reads using tophat
 echo ""
 echo "Step 2 - Mapping Reads"
-#tophat2 -o $DIR/$SUBDIR/$TOPOUT $GENOMEINDEX $DIR/$SUBDIR/1.fq $DIR/$SUBDIR/2.fq
+tophat2 -o $DIR/$SUBDIR/$TOPOUT $GENOMEINDEX $DIR/$SUBDIR/1.fq $DIR/$SUBDIR/2.fq
 
 
 # step 3: run cufflinks to compute FPKM
 echo ""
 echo "Step 3 - Assembling Transcripts"
-#cufflinks -o $DIR/$SUBDIR/$CUFFLINKS $DIR/$SUBDIR/$TOPOUT/accepted_hits.bam
+cufflinks -o $DIR/$SUBDIR/$CUFFLINKS $DIR/$SUBDIR/$TOPOUT/accepted_hits.bam
 
 
 
