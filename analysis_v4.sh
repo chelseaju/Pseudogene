@@ -54,7 +54,7 @@ python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/expected_read_count.txt -o $DIR/$SUBDI
 
 # merge the same ENSG
 cp $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup
-awk '{A[$1]+=$2; next} END{for (i in A) {print i,"\t",A[i]}}' $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt
+awk '{A[$1]+=$2; next} END{for (i in A) {print i,"\t",A[i]}}' $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup > $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt
 
 for chr in "${CHROMOSOME[@]}"
 do
@@ -66,6 +66,9 @@ do
   python observed_separator.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
   python $ENST2ENSG -d $ENST_ENSG_ENSP -i $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_genes_distribution.txt -o $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
 
+  # merge the same ENSG
+  cp $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup
+  awk '{A[$1"\t"$2]+=$3; next} END {for (i in A) {print i,"\t",A[i]}}' $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup > $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
 done
 
 # observed read distribution
