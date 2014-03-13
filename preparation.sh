@@ -8,7 +8,7 @@ ABUNDANCE=$4
 
 GENOME="/u/home/c/chelseaj/project/database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 #GENOME="/home/chelseaju/Database/Homo_sapiens_UCSC/UCSC/hg19/Sequence/WholeGenomeFasta/genome.fa"
-GENOMEINDEX="/u/home/c/chelseaj/project/database/Bowtie2Index/genome"
+GENOMEINDEX="/u/home/c/chelseaj/project/database/Ensembl/Bowtie2Index/EnsemblGenome"
 #ERROR_1="/u/scratch/c/chelseaj/database/SequenceQuality/hiseq_1.fastq"
 #ERROR_2="/u/scratch/c/chelseaj/database/SequenceQuality/hiseq_2.fastq"
 CUFFLINKS="cufflinks_out"
