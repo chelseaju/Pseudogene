@@ -28,12 +28,9 @@ def equation_LHS(input):
         (id, count) = line.split("\t")
         if(EQUATION_HASH.has_key(id)):
             EQUATION_HASH[id][0] += int(count)
-            print id
         else:
             EQUATION_HASH[id] = [int(count)]
-    
     input_fh.close()
-
 
 """
     Function: build the RHS of the equation
@@ -45,6 +42,7 @@ def equation_RHS(input):
     for line in input_fh:
         line = line.rstrip()
         (origin, mapped, count) = line.split("\t")
+
         EQUATION_HASH[origin].append((int(count), mapped))
     input_fh.close()
 
@@ -81,7 +79,7 @@ def main(parser):
     # file for expected count        
     expected_count_file = dir +  dataType + "_expected_read_count.txt"
     equation_LHS(expected_count_file)
-    
+
     # data directory
     mapping_dir = dir + "mapping/"
     

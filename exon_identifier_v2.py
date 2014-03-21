@@ -39,7 +39,7 @@ def get_chr_index(name):
     match_chr_number = re.match(r"\D*(\d+)", name)
     match_chr_X = re.match(r"\D*(x)", name)
     match_chr_Y = re.match(r"\D*(y)", name)
-    match_chr_M = re.match(r"\D*(m)", name)
+    match_chr_MT = re.match(r"\D*(mt)", name)
     
     if(match_chr_number):
         return int(match_chr_number.group(1)) - 1
@@ -50,7 +50,7 @@ def get_chr_index(name):
     elif(match_chr_Y):
         return 23
 
-    elif(match_chr_M):
+    elif(match_chr_MT):
         return 24
 
     else:
@@ -64,13 +64,13 @@ def get_chr_index(name):
 def get_chr_name(index):
     
     if(index < 22):
-        return "chr" + str(index+1)
+        return str(index+1)
     elif(index == 22):
-        return "chrX"
+        return "X"
     elif(index == 23):
-        return "chrY"
+        return "Y"
     elif(index == 24):
-        return "chrM"
+        return "MT"
     else:
         print ("unknown input %s", str(index))
         sys.exit(2)
@@ -84,6 +84,7 @@ def get_chr_name(index):
 """   
 def mark_position(bam, chromosome_name):
 
+    print chromosome_name
     chr_size = CHR_SIZE[get_chr_index(chromosome_name)]
     counts_array = [False]*chr_size
     
