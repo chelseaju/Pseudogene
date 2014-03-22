@@ -10,9 +10,9 @@ ABUNDANCE=$4
 TOPOUT="tophat_out"
 SUBDIR=$COVERAGE"X_"$READLEN"L_"$ABUNDANCE"A"
 BAM="accepted_hits.bam"
-CHROMOSOME=('chr1' 'chr2' 'chr3' 'chr4' 'chr5' 'chr6' 'chr7' 'chr8'
-	'chr9' 'chr10' 'chr11' 'chr12' 'chr13' 'chr14' 'chr15' 'chr16'
-	'chr17' 'chr18' 'chr19' 'chr20' 'chr21' 'chr22' 'chrX' 'chrY' 'chrMT')
+CHROMOSOME=('1' '2' '3' '4' '5' '6' '7' '8'
+	'9' '10' '11' '12' '13' '14' '15' '16'
+	'17' '18' '19' '20' '21' '22' 'X' 'Y' 'MT')
 
 ## MAC
 #ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
@@ -54,7 +54,7 @@ python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/expected_read_count.txt -o $DIR/$SUBDI
 
 # merge the same ENSG
 cp $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup
-awk '{A[$1]+=$2; next} END{for (i in A) {print i,"\t",A[i]}}' $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup > $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt
+awk '{A[$1]+=$2; next} END{for (i in A) {print i"\t"A[i]}}' $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup > $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt
 
 for chr in "${CHROMOSOME[@]}"
 do
@@ -68,7 +68,7 @@ do
 
   # merge the same ENSG
   cp $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup
-  awk '{A[$1"\t"$2]+=$3; next} END {for (i in A) {print i,"\t",A[i]}}' $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup > $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
+  awk '{A[$1"\t"$2]+=$3; next} END {for (i in A) {print i"\t"A[i]}}' $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup > $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
 done
 
 # observed read distribution
