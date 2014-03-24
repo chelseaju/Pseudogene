@@ -142,7 +142,10 @@ def collect_exon(position_array, max_gap):
                 
                 start_pos = i
             pre_pos = i
-        
+
+    # put in the last exon
+    if(pre_pos !=0 and start_pos != 0):
+        exons.append((start_pos, pre_pos))        
     return exons
 
 """
