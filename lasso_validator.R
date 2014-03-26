@@ -1,6 +1,6 @@
 ################################## lasso_validator.R ###################################
 # Function: Validate the prediction generated from lasso_predictor.R with real data    #
-# Usage: R --no-save < lasso_validator.R --args dir subdir type                        #
+# Usage: R --no-save < lasso_validator.R --args dir subdir type lasso                  #
 # Arguments: dir =  directory for expected data                                        #
 #           subdir = directory for the prediction and output validation laasso         #
 #     output = type_lasso_validator_v1.txt type_lasso_validator_v2.txt                 # 
@@ -15,8 +15,8 @@ read_expectation <- function(file){
     data <- read.table(file);
     c1 <- data$V1;
     row_names <- unlist(strsplit(as.character(c1), "_"));
-    index_vector <- c(1:length(row_names));
-	row_names <- row_names[which(index_vector %% 2 != 0)];
+#    index_vector <- c(1:length(row_names));
+#	row_names <- row_names[which(index_vector %% 2 == 0)];
     rownames(data) <- row_names;
     colnames(data) <- c("Name", "Expected");
     data;
@@ -47,11 +47,11 @@ subdir <- options[2];
 type <- options[3];
 lasso <- options[4];
 
-expected_file <- paste(dir,"/", subdir, "/", type, "_expected_read_count.txt", sep="");
+expected_file <- paste(dir,"/", subdir, "/tophat_out/", type, "_expected_read_count.txt", sep="");
 expectation <- read_expectation(expected_file);
 
-predicted_file_v1 <- paste(dir,"/", subdir, "/", type, "_", lasso, "_prediction_v1.txt", sep="");
-predicted_file_v2 <- paste(dir,"/", subdir, "/", type, "_", lasso, "_prediction_v2.txt", sep="");
+predicted_file_v1 <- paste(dir,"/", subdir, "/lasso_out/", type, "_", lasso, "_prediction_v1.txt", sep="");
+predicted_file_v2 <- paste(dir,"/", subdir, "/lasso_out/", type, "_", lasso, "_prediction_v2.txt", sep="");
 
 prediction_v1 <- read_prediction(predicted_file_v1, rownames(expectation));
 prediction_v2 <- read_prediction(predicted_file_v2, rownames(expectation));
@@ -68,8 +68,8 @@ rownames(validation_v2) <- rownames(prediction_v2);
 
 
 ## write to file
-output_v1 <- paste(dir, "/", subdir, "/", type, "_", lasso, "_validation_v1.txt", sep="");
-output_v2 <- paste(dir, "/", subdir, "/", type, "_", lasso, "_validation_v2.txt", sep="");
+output_v1 <- paste(dir, "/", subdir, "/lasso_out/", type, "_", lasso, "_validation_v1.txt", sep="");
+output_v2 <- paste(dir, "/", subdir, "/lasso_out/", type, "_", lasso, "_validation_v2.txt", sep="");
 
 write.table(validation_v1, file = output_v1, sep="\t");
 write.table(validation_v2, file = output_v2, sep="\t");
