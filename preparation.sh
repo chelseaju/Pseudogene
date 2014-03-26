@@ -42,7 +42,7 @@ echo "$DIR/$SUBDIR/$CUFFLINKS created"
 echo ""
 echo "Step 1 - Generating Reads"
 python abundance_assigner.py -i $GENELIST -a $ABUNDANCE -o $EXPRESSION
-java -Xmx1G -Xms1000m -jar $SIMULATOR $SIMCONFIG -GTF_File=$GTF -FASTA_File=$GENOME -Chromosome=[0-9XYM]* -Chromosome_Matching=Fuzzy -Abundance_File=$EXPRESSION -Abundance_Overwritten=No -Expressed_Transcript_Percentage=1 -Read_ID_Prefix=ENST- -Read_Length=$READLEN -Coverage_Factor=$COVERAGE -Quality_Generator=Real -Real_Quality_Score_Fastq_1=$ERROR1 -Real_Quality_Score_Fastq_2=$ERROR2 -Flip_And_Reverse=Yes -Unknown_Factor=0.0001 -Output_Fastq_1=$DIR/$SUBDIR/1.fq -Output_Fastq_2=$DIR/$SUBDIR/2.fq
+java -Xmx1G -Xms1000m -jar $SIMULATOR $SIMCONFIG -GTF_File=$GTF -FASTA_File=$GENOME -Chromosome=[0-9XYMT]* -Chromosome_Matching=Fuzzy -Abundance_File=$EXPRESSION -Abundance_Overwritten=No -Expressed_Transcript_Percentage=1 -Read_ID_Prefix=ENST- -Read_Length=$READLEN -Coverage_Factor=$COVERAGE -Quality_Generator=Real -Real_Quality_Score_Fastq_1=$ERROR1 -Real_Quality_Score_Fastq_2=$ERROR2 -Flip_And_Reverse=Yes -Unknown_Factor=0.0001 -Output_Fastq_1=$DIR/$SUBDIR/1.fq -Output_Fastq_2=$DIR/$SUBDIR/2.fq
 
 
 #$SIMULATOR $SIMCONFIG -GTF_File=$GTF -FASTA_File=$GENOME -Chromosome=[0-9XYMT]* -Chromosome_Matching=Fuzzy -Abundance_File=$EXPRESSION -Abundance_Overwritten=No -Expressed_Transcript_Percentage=1 -SV_Allowed=No -Read_ID_Prefix=ENST- -Read_Length=$READLEN -Coverage_Factor=$COVERAGE -Quality_Generator=Real -Real_Quality_Score_Fastq_1=$ERROR1 -Real_Quality_Score_Fastq_2=$ERROR2 -Flip_And_Reverse=Yes -Unknown_Factor=0.0001 -Output_Fastq_1=$DIR/$SUBDIR/1.fq -Output_Fastq_2=$DIR/$SUBDIR/2.fq
