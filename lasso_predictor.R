@@ -65,15 +65,18 @@ distribution_file <- paste(dir, "/", subdir, "/tophat_out/", type, "_distributio
 distribution <- read_distribution(distribution_file, rownames(coefficient));
 
 # reorder the coefficient for the matrix
-coefficient <- coefficient[colnames(distribution),]
+#coefficient <- coefficient[colnames(distribution),]
+
+coef <- coefficient[colnames(distribution), 2]
+coef[is.na(coef)] <- 0
 
 # predict y from matrix
-predict_y_v1 <- as.matrix(distribution) %*% as.matrix(coefficient$Coefficient);
+predict_y_v1 <- as.matrix(distribution) %*% as.matrix(coef);
 
 # mimicing the real scenario, where we do not know how the reads are distributed
 observation <- colSums(distribution);
 
-predict_y_v2 <- t(as.matrix(observation)) %*% diag(c(coefficient$Coefficient), nrow(coefficient));
+predict_y_v2 <- t(as.matrix(observation)) %*% diag(coef, length(coef));
 predict_y_v2 <- t(predict_y_v2);
 
 rownames(predict_y_v2) <- colnames(distribution);
