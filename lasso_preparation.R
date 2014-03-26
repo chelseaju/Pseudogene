@@ -26,8 +26,8 @@ read_expected_data <- function(subdir, filetype, row_order, prefix){
 	expected_data <- read.table(expected_file, header = FALSE);
 	c1 <- expected_data$V1;
 	row_names <- unlist(strsplit(as.character(c1), "_")); ## modify the rownames: split ENSG00000100478_ENST00000542754 into "ENSG00000100478" "ENST00000542754"
-	index_vector <- c(1:length(row_names));
-	row_names <- row_names[which(index_vector %% 2 == 0)];
+#	index_vector <- c(1:length(row_names));
+#	row_names <- row_names[which(index_vector %% 2 == 0)];
 	
 	rownames(expected_data) <- row_names;
     expected_data <- expected_data[row_order,];
