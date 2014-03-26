@@ -11,7 +11,7 @@ Date: 2014-03-11
 import sys, os, re, argparse, random
 
 MIN = 1
-MAX = 100
+MAX = 20
 
 """
 	Function : assign abundance to each gene
