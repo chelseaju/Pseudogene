@@ -26,8 +26,8 @@ read_expected_data <- function(subdir, filetype, row_order, prefix){
 	expected_data <- read.table(expected_file, header = FALSE);
 	c1 <- expected_data$V1;
 	row_names <- unlist(strsplit(as.character(c1), "_")); ## modify the rownames: split ENSG00000100478_ENST00000542754 into "ENSG00000100478" "ENST00000542754"
-	index_vector <- c(1:length(row_names));
-	row_names <- row_names[which(index_vector %% 2 == 0)];
+#	index_vector <- c(1:length(row_names));
+#	row_names <- row_names[which(index_vector %% 2 == 0)];
 	
 	rownames(expected_data) <- row_names;
     expected_data <- expected_data[row_order,];
@@ -49,32 +49,39 @@ if(length(options) != 2){
 dir <- options[1];
 type <- options[2];
 
-dir_10X10A <- paste(dir, "/10X_100L_10A/", sep="") 
-dir_10X30A <- paste(dir, "/10X_100L_30A/", sep="") 
-dir_10X50A <- paste(dir, "/10X_100L_50A/", sep="") 
+dir_10X1A <- paste(dir, "/10X_101L_1A/", sep="") 
+dir_10XR1A <- paste(dir, "/10X_101L_R1A/", sep="") 
+dir_10XR2A <- paste(dir, "/10X_101L_R2A/", sep="") 
+dir_10XR3A <- paste(dir, "/10X_101L_R3A/", sep="") 
 
-dir_20X10A <- paste(dir, "/20X_100L_10A/", sep="") 
-dir_20X30A <- paste(dir, "/20X_100L_30A/", sep="") 
-dir_20X50A <- paste(dir, "/20X_100L_50A/", sep="") 
+dir_20X1A <- paste(dir, "/20X_101L_1A/", sep="") 
+dir_20XR1A <- paste(dir, "/20X_101L_R1A/", sep="") 
+dir_20XR2A <- paste(dir, "/20X_101L_R2A/", sep="") 
+dir_20XR3A <- paste(dir, "/20X_101L_R3A/", sep="") 
 
-observed_10X10A <- read_distribution_matrix(dir_10X10A, type);
-observed_10X30A <- read_distribution_matrix(dir_10X30A, type);
-observed_10X50A <- read_distribution_matrix(dir_10X50A, type);
+observed_10X1A <- read_distribution_matrix(dir_10X1A, type);
+observed_10XR1A <- read_distribution_matrix(dir_10XR1A, type);
+observed_10XR2A <- read_distribution_matrix(dir_10XR2A, type);
+observed_10XR3A <- read_distribution_matrix(dir_10XR3A, type);
 
-observed_20X10A <- read_distribution_matrix(dir_20X10A, type);
-observed_20X30A <- read_distribution_matrix(dir_20X30A, type);
-observed_20X50A <- read_distribution_matrix(dir_20X50A, type);
+observed_20X1A <- read_distribution_matrix(dir_20X1A, type);
+observed_20XR1A <- read_distribution_matrix(dir_20XR1A, type);
+observed_20XR2A <- read_distribution_matrix(dir_20XR2A, type);
+observed_20XR3A <- read_distribution_matrix(dir_20XR3A, type);
 
-expected_10X10A <- read_expected_data(dir_10X10A, type, rownames(observed_10X10A), "10X10A");
-expected_10X30A <- read_expected_data(dir_10X30A, type, rownames(observed_10X30A), "10X30A");
-expected_10X50A <- read_expected_data(dir_10X50A, type, rownames(observed_10X50A), "10X50A");
+expected_10X1A <- read_expected_data(dir_10X1A, type, rownames(observed_10X1A), "10X1A");
+expected_10XR1A <- read_expected_data(dir_10XR1A, type, rownames(observed_10XR1A), "10XR1A");
+expected_10XR2A <- read_expected_data(dir_10XR2A, type, rownames(observed_10XR2A), "10XR2A");
+expected_10XR3A <- read_expected_data(dir_10XR3A, type, rownames(observed_10XR3A), "10XR3A");
 
-expected_20X10A <- read_expected_data(dir_20X10A, type, rownames(observed_20X10A), "20X10A");
-expected_20X30A <- read_expected_data(dir_20X30A, type, rownames(observed_20X30A), "20X30A");
-expected_20X50A <- read_expected_data(dir_20X50A, type, rownames(observed_20X50A), "20X50A");
+expected_20X1A <- read_expected_data(dir_20X1A, type, rownames(observed_20X1A), "20X1A");
+expected_20XR1A <- read_expected_data(dir_20XR1A, type, rownames(observed_20XR1A), "20XR1A");
+expected_20XR2A <- read_expected_data(dir_20XR2A, type, rownames(observed_20XR2A), "20XR2A");
+expected_20XR3A <- read_expected_data(dir_20XR3A, type, rownames(observed_20XR3A), "20XR3A");
 
-y <- rbind(expected_10X10A, expected_10X30A, expected_10X50A, expected_20X10A, expected_20X30A, expected_20X50A); 
-x <- rbind.fill(observed_10X10A, observed_10X30A, observed_10X50A, observed_20X10A, observed_20X30A, observed_20X50A);
+
+y <- rbind(expected_10X1A, expected_10XR1A, expected_10XR2A, expected_10XR3A, expected_20X1A, expected_20XR1A, expected_20XR2A, expected_20XR3A);
+x <- rbind.fill(observed_10X1A, observed_10XR1A, observed_10XR2A, observed_10XR3A, observed_20X1A, observed_20XR1A, observed_20XR2A, observed_20XR3A);
 
 x_colname <- colnames(x);
 x[is.na(x)] <- 0;
