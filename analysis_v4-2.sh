@@ -26,18 +26,26 @@ X30AR1="30X_101L_R1A"
 X30AR2="30X_101L_R2A"
 X30AR3="30X_101L_R3A"
 
+X3AR1="3X_101L_R1A"
+X5AR1="5X_101L_R1A"
+X7AR1="7X_101L_R1A"
+X13AR1="13X_101L_R1A"
+X17AR1="17X_101L_R1A"
+X23AR1="23X_101L_R1A"
+X27AR1="27X_101L_R1A"
+
 
 echo ""
 echo "Step 1: Unify the Unknowns"
-#python unknown_unifier.py -o $DIR -t ENSG -d $DIR/$X10A1/$TOPOUT/ $DIR/$X10AR1/$TOPOUT/ $DIR/$X10AR2/$TOPOUT/ $DIR/$X10AR3/$TOPOUT/ $DIR/$X20A1/$TOPOUT/ $DIR/$X20AR1/$TOPOUT/ $DIR/$X20AR2/$TOPOUT/ $DIR/$X20AR3/$TOPOUT/ $DIR/$X30A1/$TOPOUT/ $DIR/$X30AR1/$TOPOUT/ $DIR/$X30AR2/$TOPOUT/ $DIR/$X30AR3/$TOPOUT/
-
+python unknown_unifier.py -o $DIR -t ENSG -d $DIR/$X10A1/$TOPOUT/ $DIR/$X10AR1/$TOPOUT/ $DIR/$X10AR2/$TOPOUT/ $DIR/$X10AR3/$TOPOUT/ $DIR/$X20A1/$TOPOUT/ $DIR/$X20AR1/$TOPOUT/ $DIR/$X20AR2/$TOPOUT/ $DIR/$X20AR3/$TOPOUT/ $DIR/$X30A1/$TOPOUT/ $DIR/$X30AR1/$TOPOUT/ $DIR/$X30AR2/$TOPOUT/ $DIR/$X30AR3/$TOPOUT/ $DIR/$X3AR1/$TOPOUT/ $DIR/$X5AR1/$TOPOUT/ $DIR/$X7AR1/$TOPOUT/ $DIR/$X13AR1/$TOPOUT/ $DIR/$X17AR1/$TOPOUT/ $DIR/$X23AR1/$TOPOUT/ $DIR/$X27AR1/$TOPOUT/
 
 echo ""
 echo "Step 2: Prepare Data for Lasso"
-#R --no-save --slave < lasso_preparation.R --args $DIR ENSG
+mkdir -p $DIR/LassoTraining
+R --no-save --slave < lasso_preparation_v2.R --args $DIR ENSG
 
 echo ""
-#echo "Step 3: Training Coefficient with Lasso"
+echo "Step 3: Training Coefficient with Lasso"
 #R --no-save --slave < lasso_trainer.R --args $DIR ENSG
 
 echo ""
@@ -50,21 +58,23 @@ mkdir -p $DIR/$X30AR3/lasso_out
 
 echo ""
 echo "Step 4: Lasso Prediction"
-R --no-save --slave < lasso_predictor.R --args $DIR $X30A1 ENSG glmnet
-R --no-save --slave < lasso_predictor.R --args $DIR $X30AR1 ENSG glmnet
-R --no-save --slave < lasso_predictor.R --args $DIR $X30AR2 ENSG glmnet
-R --no-save --slave < lasso_predictor.R --args $DIR $X30AR3 ENSG glmnet
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A10/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A30/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_predictor.R --args $DIR $X30A50/$TOPOUT genes genlasso
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30A1 ENSG glmnet
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30AR1 ENSG glmnet
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30AR2 ENSG glmnet
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30AR3 ENSG glmnet
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30A1 ENSG genlasso
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30AR1 ENSG genlasso
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30AR2 ENSG genlasso
+#R --no-save --slave < lasso_predictor.R --args $DIR $X30AR3 ENSG genlasso
 
 
 echo ""
 echo "Step 5: Lasso Validation"
-R --no-save --slave < lasso_validator.R --args $DIR $X30A1 ENSG glmnet
-R --no-save --slave < lasso_validator.R --args $DIR $X30AR1 ENSG glmnet
-R --no-save --slave < lasso_validator.R --args $DIR $X30AR2 ENSG glmnet
-R --no-save --slave < lasso_validator.R --args $DIR $X30AR3 ENSG glmnet
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A10/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A30/$TOPOUT genes genlasso
-#R --no-save --slave < lasso_validator.R --args $DIR $X30A50/$TOPOUT genes genlasso
+#R --no-save --slave < lasso_validator.R --args $DIR $X30A1 ENSG glmnet
+#R --no-save --slave < lasso_validator.R --args $DIR $X30AR1 ENSG glmnet
+#R --no-save --slave < lasso_validator.R --args $DIR $X30AR2 ENSG glmnet
+#R --no-save --slave < lasso_validator.R --args $DIR $X30AR3 ENSG glmnet
+#R --no-save --slave < lasso_validator.R --args $DIR $X30A1 ENSG genlasso
+#R --no-save --slave < lasso_validator.R --args $DIR $X30AR1 ENSG genlasso
+#R --no-save --slave < lasso_validator.R --args $DIR $X30AR2 ENSG genlasso
+#R --no-save --slave < lasso_validator.R --args $DIR $X30AR3 ENSG genlasso

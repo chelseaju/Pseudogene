@@ -1,14 +1,14 @@
-########################### lasso_predictor.R #############################
+########################### lasso_predictor_2.R ###########################
 # Function: use the trained coefficient generated from lasso_trainer.R    #
 #   to predict the fragment count. two types of prediction is performed:  #
 #   1. take in the matrix X to compute Y                                  #
 #   2. combine the read count for a specific region (mimicing the real    #
 #      scenario), and compute Y                                           #
-# Usage: R --no-save < lasso_predictor.R --args dir subdir type lasso     #
+# Usage: R --no-save < lasso_predictor.R --args dir subdir type laasso    #
 # Arguments: dir =  directory for coefficient                             #
 #           subdir = directory for the predicting file and output         #
-#            type = genes or transcripts or ENSG                          #
-#	    lasso = genlasso or glmnet                                        #
+#            type = genes or transcripts                                  #
+#	    lasso = genlasso or glmnet                                    #
 # Output = type_lasso_predictor_v1.txt type_lasso_predictor_v2.txt        #
 # Author: Chelsea Ju                                                      #
 # Date: 2014-01-15                                                        #
@@ -19,8 +19,7 @@ library(plyr)
 
 read_coefficient <- function(file, lasso){
 
-    ifelse(lasso == "genlasso", data <- read.table(file, skip = 3), data <- read.table(file, skip = 0));
-
+    ifelse(lasso == "genlasso", data <- read.table(file, skip = 3), data <- read.table(file, skip = 2));
     colnames(data) <- c("Gene", "Coefficient");
     rownames(data) <- data$Gene;
     data;
@@ -58,10 +57,10 @@ lasso <- options[4];
 #coefficient_file <- paste(dir,"/", type, "_lasso_coefficient_genlasso.xls", sep="");
 #coefficient <- read_coefficient_genlasso(coefficient_file);
 
-coefficient_file <- paste(dir,"/", type, "_", lasso, "_coefficient.xls", sep="");
+coefficient_file <- paste(dir,"/", type, "_", lasso, "_coefficient_training2.xls", sep="");
 coefficient <- read_coefficient(coefficient_file, lasso);
 
-distribution_file <- paste(dir, "/", subdir, "/tophat_out/", type, "_distribution.matrix", sep="");
+distribution_file <- paste(dir, "/", subdir, "/", type, "_distribution.matrix", sep="");
 distribution <- read_distribution(distribution_file, rownames(coefficient));
 
 # reorder the coefficient for the matrix
@@ -80,8 +79,8 @@ rownames(predict_y_v2) <- colnames(distribution);
 
 
 ## write to file
-output_v1 <- paste(dir, "/", subdir, "/lasso_out/", type, "_", lasso, "_prediction_v1.txt", sep="");
-output_v2 <- paste(dir, "/", subdir, "/lasso_out/", type, "_", lasso, "_prediction_v2.txt", sep="");
+output_v1 <- paste(dir, "/", subdir, "/", type, "_", lasso, "_training_2_prediction_v1.txt", sep="");
+output_v2 <- paste(dir, "/", subdir, "/", type, "_", lasso, "_training_2_prediction_v2.txt", sep="");
 
 write.table(predict_y_v1, file = output_v1, sep="\t", col.names = FALSE);
 write.table(predict_y_v2, file = output_v2, sep="\t", col.names = FALSE);
