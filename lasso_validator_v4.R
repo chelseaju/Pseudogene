@@ -31,7 +31,7 @@ rownames(Y_vector) <- Y_vector$Gene;
 
 
 predicted_file_v1 <- paste(dir, "/LassoValidation/", type, "_", subdir, "_prediction_v1.txt", sep="");
-predicted_file_v2 <- paste(dir, "/LassoValidation/", type, "_", subdir, "_prediction_v1.txt", sep="");
+predicted_file_v2 <- paste(dir, "/LassoValidation/", type, "_", subdir, "_prediction_v2.txt", sep="");
 
 predicted_y_v1 <- read.table(predicted_file_v1, col.names = c("Gene","Prediction"));
 predicted_y_v2 <- read.table(predicted_file_v2, col.names = c("Gene","Prediction"));

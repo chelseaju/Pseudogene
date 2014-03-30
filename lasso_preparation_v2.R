@@ -51,8 +51,8 @@ type <- options[2];
 
 ## for percentage matrix and distribution matrix
 dir_3XR1A <- paste(dir, "/3X_101L_R1A/", sep="")
-dir_5XR1A <- paste(dir, "/3X_101L_R1A/", sep="")
-dir_7XR1A <- paste(dir, "/3X_101L_R1A/", sep="")
+dir_5XR1A <- paste(dir, "/5X_101L_R1A/", sep="")
+dir_7XR1A <- paste(dir, "/7X_101L_R1A/", sep="")
 dir_10XR1A <- paste(dir, "/10X_101L_R1A/", sep="")
 dir_13XR1A <- paste(dir, "/13X_101L_R1A/", sep="")
 dir_17XR1A <- paste(dir, "/17X_101L_R1A/", sep="")
@@ -91,16 +91,16 @@ observed_20XR3A <- read_distribution_matrix(dir_20XR3A, type);
 
 
 ## expected vector
-expected_3XR1A <- read_expected_data(dir_3XR1A, type, rownames(observed_3XR1A), "3XR2A");
-expected_5XR1A <- read_expected_data(dir_5XR1A, type, rownames(observed_5XR1A), "5XR2A");
-expected_7XR1A <- read_expected_data(dir_7XR1A, type, rownames(observed_7XR1A), "7XR2A");
-expected_10XR1A <- read_expected_data(dir_10XR1A, type, rownames(observed_10XR1A), "10XR2A");
-expected_13XR1A <- read_expected_data(dir_13XR1A, type, rownames(observed_13XR1A), "13XR2A");
-expected_17XR1A <- read_expected_data(dir_17XR1A, type, rownames(observed_17XR1A), "17XR2A");
-expected_20XR1A <- read_expected_data(dir_20XR1A, type, rownames(observed_20XR1A), "20XR2A");
-expected_23XR1A <- read_expected_data(dir_23XR1A, type, rownames(observed_23XR1A), "23XR2A");
-expected_27XR1A <- read_expected_data(dir_27XR1A, type, rownames(observed_27XR1A), "27XR2A");
-expected_30XR1A <- read_expected_data(dir_30XR1A, type, rownames(observed_30XR1A), "30XR2A");
+expected_3XR1A <- read_expected_data(dir_3XR1A, type, rownames(observed_3XR1A), "3XR1A");
+expected_5XR1A <- read_expected_data(dir_5XR1A, type, rownames(observed_5XR1A), "5XR1A");
+expected_7XR1A <- read_expected_data(dir_7XR1A, type, rownames(observed_7XR1A), "7XR1A");
+expected_10XR1A <- read_expected_data(dir_10XR1A, type, rownames(observed_10XR1A), "10XR1A");
+expected_13XR1A <- read_expected_data(dir_13XR1A, type, rownames(observed_13XR1A), "13XR1A");
+expected_17XR1A <- read_expected_data(dir_17XR1A, type, rownames(observed_17XR1A), "17XR1A");
+expected_20XR1A <- read_expected_data(dir_20XR1A, type, rownames(observed_20XR1A), "20XR1A");
+expected_23XR1A <- read_expected_data(dir_23XR1A, type, rownames(observed_23XR1A), "23XR1A");
+expected_27XR1A <- read_expected_data(dir_27XR1A, type, rownames(observed_27XR1A), "27XR1A");
+expected_30XR1A <- read_expected_data(dir_30XR1A, type, rownames(observed_30XR1A), "30XR1A");
 
 
 expected_10X1A<- read_expected_data(dir_10X1A, type, rownames(observed_10X1A), "10X1A");
@@ -124,6 +124,7 @@ x[is.na(x)] <- 0;
 colnames(y) <- c("Gene_Name", "Read_Count");
 rownames(x) <- rownames(y);
 
+normalized_x <- x / y$Read_Count
 
 # output data
 filename <- c("3XR1A", "5XR1A", "7XR1A", "10XR1A", "13XR1A", "17XR1A", "20XR1A", "23XR1A", "27XR1A", "30XR1A", "10X1A", "10XR2A", "10XR3A","20X1A","20XR2A","20XR3A"); 
@@ -137,7 +138,7 @@ for (i in 1:length(filename)){
 	expected_file <- paste(dir, "/LassoTraining/", type, "_", filename[i], "_expected_Y.txt", sep="");
 	training_file <- paste(dir, "/LassoTraining/", type, "_", filename[i], "_matrix_X.txt", sep="");	
 	
-	write.table(x[start:end,], training_file, sep="\t");
+	write.table(normalized_x[start:end,], training_file, sep="\t");
 	write.table(y[start:end,], expected_file, sep="\t");
 	
 	print(paste("Written the Expected Value (Y) to ", expected_file, sep=""));

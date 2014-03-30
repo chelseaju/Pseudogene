@@ -50,22 +50,22 @@ echo "Step 3: Training Coefficient with Lasso"
 
 echo ""
 echo "Step 3: Prepare Data for Validation"
-mkdir -p $DIR/LassoValidation
-cp $DIR/$X30A1/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30X1A_matrix_X.txt
-cp $DIR/$X30AR2/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR2A_matrix_X.txt
-cp $DIR/$X30AR3/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR3A_matrix_X.txt
-cp $DIR/$X30A1/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30X1A_expected_Y.txt
-cp $DIR/$X30AR2/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR2A_expected_Y.txt
-cp $DIR/$X30AR3/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR3A_expected_Y.txt
+#mkdir -p $DIR/LassoValidation
+#cp $DIR/$X30A1/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30X1A_matrix_X.txt
+#cp $DIR/$X30AR2/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR2A_matrix_X.txt
+#cp $DIR/$X30AR3/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR3A_matrix_X.txt
+#cp $DIR/$X30A1/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30X1A_expected_Y.txt
+#cp $DIR/$X30AR2/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR2A_expected_Y.txt
+#cp $DIR/$X30AR3/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR3A_expected_Y.txt
 
 echo ""
 echo "Step 4: Lasso Prediction"
-R --no-save --slave < lasso_predictor_v4.R --args $DIR 30X1A ENSG
-R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR2A ENSG
-R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR3A ENSG
+#R --no-save --slave < lasso_predictor_v4.R --args $DIR 30X1A ENSG
+#R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR2A ENSG
+#R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR3A ENSG
 
 echo ""
 echo "Step 5: Lasso Validation"
-R --no-save --slave < lasso_validator_v4.R --args $DIR 30X1A ENSG
-R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR2A ENSG
-R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR3A ENSG
+#R --no-save --slave < lasso_validator_v4.R --args $DIR 30X1A ENSG
+#R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR2A ENSG
+#R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR3A ENSG

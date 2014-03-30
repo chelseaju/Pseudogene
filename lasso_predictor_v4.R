@@ -71,16 +71,24 @@ colnames(predict_x) <- colnames(filter_X);
 rownames(predict_x) <- rownames(filter_X);
 predict_y_v2 <- as.matrix(predict_x) %*% as.matrix(filter_betas);
 
-
 ## write to file
 output_v1 <- paste(dir, "/LassoValidation/", type, "_", subdir, "_prediction_v1.txt", sep="");
 output_v2 <- paste(dir, "/LassoValidation/", type, "_", subdir, "_prediction_v2.txt", sep="");
 
+output_predictX <- paste(dir, "/LassoValidation/", type, "_", subdir, "_prediction_x.txt", sep="");
+output_expectedX <- paste(dir, "/LassoValidation/", type, "_", subdir, "_expected_x.txt", sep="");
+
 write.table(predict_y_v1, file = output_v1, sep="\t", col.names = FALSE);
 write.table(predict_y_v2, file = output_v2, sep="\t", col.names = FALSE);
 
+write.table(predict_x, file = output_predictX, sep="\t");
+write.table(filter_X, file = output_expectedX, sep="\t");
+
+
 print(paste("Writing the prediction to ", output_v1, sep=""));
 print(paste("Writing the prediction to ", output_v2, sep=""));
+print(paste("Writing the predicted X to ", output_predictX, sep=""));
+print(paste("Writing the expected X to ", output_expectedX, sep=""));
 
 
 
