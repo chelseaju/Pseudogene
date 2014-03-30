@@ -29,11 +29,11 @@ mkdir -p $CUFFMERGE
 echo ""
 echo "Step 1 - Creating Assemblies.txt"
 echo "$DIR/$SAMPLEA/$CUFFLINK/transcripts.gtf" > $ASSEMBLY
-echo "$DIR/$SAMPLEA-2/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
-echo "$DIR/$SAMPLEA-3/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
+#echo "$DIR/$SAMPLEA-2/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
+#echo "$DIR/$SAMPLEA-3/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
 echo "$DIR/$SAMPLEB/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
-echo "$DIR/$SAMPLEB-2/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
-echo "$DIR/$SAMPLEB-3/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
+#echo "$DIR/$SAMPLEB-2/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
+#echo "$DIR/$SAMPLEB-3/$CUFFLINK/transcripts.gtf" >> $ASSEMBLY
 echo "Write to $ASSEMBLY"
 
 ## Step 2: Running cuffmerge
@@ -41,6 +41,7 @@ echo ""
 echo "Step 2 - Running Cuffmerge"
 echo "cuffmerge -o $CUFFMERGE -g $GTF -s $GENOME $ASSEMBLY"
 #cuffmerge -p 8 -o $CUFFMERGE -g $GTF -s $GENOME $ASSEMBLY
+cuffmerge -p 8 -o $CUFFMERGE  -s $GENOME $ASSEMBLY
 
 ## Step 3: Runing cuffdiff
 echo ""

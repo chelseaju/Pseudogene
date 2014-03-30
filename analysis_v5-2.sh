@@ -37,12 +37,12 @@ X27AR1="27X_101L_R1A"
 
 echo ""
 echo "Step 1: Unify the Unknowns"
-python unknown_unifier.py -o $DIR -t ENSG -d $DIR/$X10A1/$TOPOUT/ $DIR/$X10AR1/$TOPOUT/ $DIR/$X10AR2/$TOPOUT/ $DIR/$X10AR3/$TOPOUT/ $DIR/$X20A1/$TOPOUT/ $DIR/$X20AR1/$TOPOUT/ $DIR/$X20AR2/$TOPOUT/ $DIR/$X20AR3/$TOPOUT/ $DIR/$X30A1/$TOPOUT/ $DIR/$X30AR1/$TOPOUT/ $DIR/$X30AR2/$TOPOUT/ $DIR/$X30AR3/$TOPOUT/ $DIR/$X3AR1/$TOPOUT/ $DIR/$X5AR1/$TOPOUT/ $DIR/$X7AR1/$TOPOUT/ $DIR/$X13AR1/$TOPOUT/ $DIR/$X17AR1/$TOPOUT/ $DIR/$X23AR1/$TOPOUT/ $DIR/$X27AR1/$TOPOUT/
+#python unknown_unifier.py -o $DIR -t ENSG -d $DIR/$X10A1/$TOPOUT/ $DIR/$X10AR1/$TOPOUT/ $DIR/$X10AR2/$TOPOUT/ $DIR/$X10AR3/$TOPOUT/ $DIR/$X20A1/$TOPOUT/ $DIR/$X20AR1/$TOPOUT/ $DIR/$X20AR2/$TOPOUT/ $DIR/$X20AR3/$TOPOUT/ $DIR/$X30A1/$TOPOUT/ $DIR/$X30AR1/$TOPOUT/ $DIR/$X30AR2/$TOPOUT/ $DIR/$X30AR3/$TOPOUT/ $DIR/$X3AR1/$TOPOUT/ $DIR/$X5AR1/$TOPOUT/ $DIR/$X7AR1/$TOPOUT/ $DIR/$X13AR1/$TOPOUT/ $DIR/$X17AR1/$TOPOUT/ $DIR/$X23AR1/$TOPOUT/ $DIR/$X27AR1/$TOPOUT/
 
 echo ""
 echo "Step 2: Prepare Data for Lasso"
 mkdir -p $DIR/LassoTraining
-R --no-save --slave < lasso_preparation_v2.R --args $DIR ENSG
+#R --no-save --slave < lasso_preparation_v2.R --args $DIR ENSG
 
 echo ""
 echo "Step 3: Training Coefficient with Lasso"
@@ -51,21 +51,21 @@ echo "Step 3: Training Coefficient with Lasso"
 echo ""
 echo "Step 3: Prepare Data for Validation"
 #mkdir -p $DIR/LassoValidation
-#cp $DIR/$X30A1/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30X1A_matrix_X.txt
-#cp $DIR/$X30AR2/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR2A_matrix_X.txt
-#cp $DIR/$X30AR3/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR3A_matrix_X.txt
-#cp $DIR/$X30A1/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30X1A_expected_Y.txt
-#cp $DIR/$X30AR2/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR2A_expected_Y.txt
-#cp $DIR/$X30AR3/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR3A_expected_Y.txt
+cp $DIR/$X30A1/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30X1A_matrix_X.txt
+cp $DIR/$X30AR2/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR2A_matrix_X.txt
+cp $DIR/$X30AR3/$TOPOUT/ENSG_distribution.matrix $DIR/LassoValidation/ENSG_30XR3A_matrix_X.txt
+cp $DIR/$X30A1/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30X1A_expected_Y.txt
+cp $DIR/$X30AR2/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR2A_expected_Y.txt
+cp $DIR/$X30AR3/$TOPOUT/ENSG_expected_read_count.txt $DIR/LassoValidation/ENSG_30XR3A_expected_Y.txt
 
 echo ""
 echo "Step 4: Lasso Prediction"
-#R --no-save --slave < lasso_predictor_v4.R --args $DIR 30X1A ENSG
-#R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR2A ENSG
-#R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR3A ENSG
+R --no-save --slave < lasso_predictor_v4.R --args $DIR 30X1A ENSG
+R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR2A ENSG
+R --no-save --slave < lasso_predictor_v4.R --args $DIR 30XR3A ENSG
 
 echo ""
 echo "Step 5: Lasso Validation"
-#R --no-save --slave < lasso_validator_v4.R --args $DIR 30X1A ENSG
-#R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR2A ENSG
-#R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR3A ENSG
+R --no-save --slave < lasso_validator_v4.R --args $DIR 30X1A ENSG
+R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR2A ENSG
+R --no-save --slave < lasso_validator_v4.R --args $DIR 30XR3A ENSG
