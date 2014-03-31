@@ -13,14 +13,15 @@ Update from gene_identifier.py
 import sys, re, os, subprocess, random, argparse
 
 
-#DB = "/home/chelseaju/Database/Pseudogene/ENST_Pseudogene_74.bed"
 
 # LAB
+#DB = "/home/chelseaju/Database/Pseudogene/Parent_Pseudogene_74.bed"
 #ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
 #PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
 
 # HOFFMAN
+DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
 ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
 PARENT_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENST_74.bed"
 PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
@@ -213,6 +214,7 @@ def main(parser):
     
     chr = convert_chromosome_name(chromosome_name)
 
+
     # map to parent genes
     (mapped_parents, unknown) = map_exon_to_gene(input_file, PARENT_GENE)
     export_temp_unknown(unknown, output_temp)
@@ -222,6 +224,11 @@ def main(parser):
     (mapped_pseudo, unknown) = map_exon_to_gene(output_temp, PSEUDO_GENE)
     export_temp_unknown(unknown, output_temp)
     export_genes(mapped_pseudo, output_file, chromosome_name, True)
+
+    # map to parents and pseudogene
+#    (mapped_parents, unknown) = map_exon_to_gene(input_file, DB)
+#    export_temp_unknown(unknown, output_temp)
+#    export_genes(mapped_parents, output_file, chromosome_name, False)
 
     # map to all genes
     (mapped_ensembl, unknown) = map_exon_to_gene(output_temp, ENSEMBL_GENE)
