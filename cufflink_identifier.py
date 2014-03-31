@@ -1,7 +1,7 @@
 """ cufflink_identifier.py
 Usage: python cufflink_identifier.py -d cufflink_directory 
 Input:  -d input/output directory (select_pseudogene_128_v2/10X_100L_1A_30X_100L_1A)
-Output: line of cufflink output matched to gene of interests {XLOC_XXX \t ENSG_XXX}
+Output: line of cufflink output matched to gene of interests {XLOC_XXX \t ENSG_XXX \t COVERAGE \t ALTERNATE_IDs}
 Function: 1. intersect a list of region identified by cufflinks with the annotation file
           2. output the corresponding gene name
 
