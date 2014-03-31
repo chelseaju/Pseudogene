@@ -10,8 +10,8 @@ Date: 2014-03-30
 Author: Chelsea Ju
 """
 
-GENES = {}
 XLOC = {}
+EXPECTATION = {}
 
 
 import sys, re, os, subprocess, random, argparse
@@ -24,39 +24,85 @@ def build_name(file):
 	for line in fh:
 		line = line.rstrip()
 		data = line.split("\t")
-		xloc = data[0]
-		genes = data[3].split(",")
-
-		for g in genes:
-			GENES[g] = (xloc)
-	fh.close()
-
-"""
-	Function : build observation
-"""
-def build_observation(file):
-
-	fh = open(file, 'rb')
-	for line in fh:
-		line = line.rstrip()
-		data = line.split("\t")
-		xname = data[0]
-		data.append("0")
-		data.append("0")
-		XLOC{xname} = data
+		x = data[0]
+		alternative_ids = data[3]
+		XLOC[x] = alternative_ids.split(",")
 	fh.close()
 
 """
 	Function : read in expected count for each gene
 """
-def build_expectation(fileA, fileB):
+def build_expectation(file, order):
 
-	fh = open(fileA, 'rb')
+	fh = open(file, 'rb')
 	for line in fh:
-		(name, count) = line
+		line = line.rstrip()
+		(name, count) = line.split("\t")
+
+		if(EXPECTATION.has_key(name)):
+			EXPECTATION[name][order] = count
+		else:
+			count_data = ["0","0"]
+			count_data[order] = count
+			EXPECTATION[name] = count_data
+
+	fh.close()
+
+def combine_expectation_observation(result):
+
+	evaluation_data = []
+	seen_ids = {}
+
+	# mark all expected ids
+	for k in EXPECTATION.keys():
+		seen_ids[k] = False
+
+	fh = open(result, 'rb')
+	line = fh.readline()
+	for line in fh:
+		line = line.rstrip()
+		data = line.split("\t")
+		xid = data[0]
+		xgene = data[1]
+
+		if(EXPECTATION.has_key(xgene)):
+			data = data + [xgene] + EXPECTATION[xgene]
+			seen_ids[xgene] = True
+		else:
+			found = False
+			if(XLOC.has_key(xid)):
+				for a_gene in XLOC[xid]:
+					if(EXPECTATION.has_key(a_gene)):
+						data = data + [a_gene] + EXPECTATION[a_gene]
+						seen_ids[a_gene] = True
+						found = True
+						break
+
+			if(not found):
+				data = data + ["-", "0","0"]
+
+		evaluation_data.append(data)
+
+	fh.close()
+
+	for k in sorted(seen_ids, key=seen_ids.get):
+		if(seen_ids[k] == False):
+			data = ["-",k,"-","-","-","-","-",k] + EXPECTATION[k]
+			evaluation_data.append(data)
+		else:
+			break
 
 
+	return evaluation_data
 
+def export_data(result, file):
+	fh = open(file, 'w')
+	fh.write("XLOC\tGENENAME\tOVERLAP\tFPKM_A\tFPKM_B\tCOUNT_A\tCOUNT_B\tEXPECTED\tEXPECTED_A\tEXPECTED_B\n")
+	for r in result:
+		fh.write("\t".join(r))
+		fh.write("\n")
+
+	fh.close()
 
 def main(parser):
     
@@ -74,13 +120,12 @@ def main(parser):
     outfile = dir + "cufflink_evaluation.txt"
 
     build_name(name_file)
-    build_observation(result)
-    build_expectation(file_A, file_B)
+    build_expectation(file_A, 0)
+    build_expectation(file_B, 1)
 
+    evaluation = combine_expectation_observation(result)
 
-#    evaluation = combine_expectation_observation(a_exp, b_exp, result)
-
-#    export_data(evaluation, outfile)
+    export_data(evaluation, outfile)
 
     print ""
     print "Writing Gene List to File : %s" %(outfile)
