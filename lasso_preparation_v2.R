@@ -193,7 +193,7 @@ print(paste("Number of variance > 0.05 = ", length(which(diag_normalized_var > 0
 validate_10XR3A <- rbind.fill(observed_10XR3A, as.data.frame(diag_normalized_median));
 validate_10XR3A[is.na(validate_10XR3A)] <- 0;
 validate_10XR3A <- validate_10XR3A[1:gene_count,colnames(diag_normalized_median)];
-rownames(validate_20XR3A) <- rownames(observed_20XR3A);
+rownames(validate_10XR3A) <- rownames(observed_10XR3A);
 
 out_X_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_X.txt", sep="");
 out_Y_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_Y.txt", sep="");
