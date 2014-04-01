@@ -166,9 +166,9 @@ diag_normalized_mean <- matrix(apply(diag_normalized_x_in_vector, 2, mean), byro
 diag_normalized_median <- matrix(apply(diag_normalized_x_in_vector, 2, median), byrow = F, nrow = gene_count)
 diag_normalized_var <- matrix(apply(diag_normalized_x_in_vector, 2, var), byrow = F, nrow = gene_count)
 
-rownames(diag_normalized_mean) <- rownames(expected_3XR1A)
-rownames(diag_normalized_median) <- rownames(expected_3XR1A)
-rownames(diag_normalized_var) <- rownames(expected_3XR1A)
+rownames(diag_normalized_mean) <- rownames(observed_10X1A)
+rownames(diag_normalized_median) <- rownames(observed_10X1A)
+rownames(diag_normalized_var) <- rownames(observed_10X1A)
 
 colnames(diag_normalized_mean) <- x_colname
 colnames(diag_normalized_median) <- x_colname
@@ -194,8 +194,8 @@ validate_10XR3A <- rbind.fill(observed_10XR3A, as.data.frame(diag_normalized_med
 validate_10XR3A[is.na(validate_10XR3A)] <- 0;
 validate_10XR3A <- validate_10XR3A[1:gene_count,colnames(diag_normalized_median)];
 
-out_X_10XR3A_file <- paste(dir, "/LassoTraining_v2", type, "_10XR3A_validation_X.txt", sep="");
-out_Y_10XR3A_file <- paste(dir, "/LassoTraining_v2", type, "_10XR3A_validation_Y.txt", sep="");
+out_X_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_X.txt", sep="");
+out_Y_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_Y.txt", sep="");
 write.table(validate_10XR3A, out_X_10XR3A_file, sep="\t");
 write.table(expected_10XR3A, out_Y_10XR3A_file, sep="\t");
 
@@ -207,8 +207,8 @@ validate_20XR3A <- rbind.fill(observed_20XR3A, as.data.frame(diag_normalized_med
 validate_20XR3A[is.na(validate_20XR3A)] <- 0;
 validate_20XR3A <- validate_20XR3A[1:gene_count,colnames(diag_normalized_median)];
 
-out_X_20XR3A_file <- paste(dir, "/LassoTraining_v2", type, "_20XR3A_validation_X.txt", sep="");
-out_Y_20XR3A_file <- paste(dir, "/LassoTraining_v2", type, "_20XR3A_validation_Y.txt", sep="");
+out_X_20XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_20XR3A_validation_X.txt", sep="");
+out_Y_20XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_20XR3A_validation_Y.txt", sep="");
 write.table(validate_20XR3A, out_X_20XR3A_file, sep="\t");
 write.table(expected_20XR3A, out_Y_20XR3A_file, sep="\t");
 
@@ -220,8 +220,8 @@ validate_30XR3A <- rbind.fill(observed_30XR3A, as.data.frame(diag_normalized_med
 validate_30XR3A[is.na(validate_30XR3A)] <- 0;
 validate_30XR3A <- validate_30XR3A[1:gene_count,colnames(diag_normalized_median)];
 
-out_X_30XR3A_file <- paste(dir, "/LassoTraining_v2", type, "_30XR3A_validation_X.txt", sep="");
-out_Y_30XR3A_file <- paste(dir, "/LassoTraining_v2", type, "_30XR3A_validation_Y.txt", sep="");
+out_X_30XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_30XR3A_validation_X.txt", sep="");
+out_Y_30XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_30XR3A_validation_Y.txt", sep="");
 write.table(validate_30XR3A, out_X_30XR3A_file, sep="\t");
 write.table(expected_30XR3A, out_Y_30XR3A_file, sep="\t");
 
