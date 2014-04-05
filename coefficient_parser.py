@@ -1,8 +1,8 @@
-""" coefficient_parser.py
+""" locus_parser.py
 Usage: python coefficient_parser.py -d directory -t type 
 Input:  -d input/output directory (select_pseudogene_128_v2)
 		-t type = gene or isoform
-Output: line of coefficient with genomic locus {Gene_id \t Chr \t Start \t End \t Coefficient\n}
+Output: line of coefficient with genomic locus {Gene_id \t Chr \t Start \t End \t Count\n}
 Function: Parse out the genomic location for each coefficient
 Date: 2014-04-01
 Author: Chelsea Ju

@@ -50,7 +50,7 @@ echo "Step 1: Read Counts for Genes"
 
 # expect read count
 python expected_counter_v2.py -d $DIR/$SUBDIR/$TOPOUT
-#python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.txt -o $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt -d $ENST_ENSG_ENSP
+python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.txt -o $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt -d $ENST_ENSG_ENSP
 
 # merge the same ENSG
 cp $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup
@@ -64,16 +64,18 @@ do
   python exon_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python gene_identifier_v3.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python observed_separator_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
-#  python $ENST2ENSG -d $ENST_ENSG_ENSP -i $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_genes_distribution.txt -o $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
+  python $ENST2ENSG -d $ENST_ENSG_ENSP -i $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_genes_distribution.txt -o $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
 
   # merge the same ENSG
-#  cp $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup
-#  awk '{A[$1"\t"$2]+=$3; next} END {for (i in A) {print i"\t"A[i]}}' $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup > $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
+  cp $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup
+  awk '{A[$1"\t"$2]+=$3; next} END {for (i in A) {print i"\t"A[i]}}' $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.backup > $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
 done
 
 # observed read distribution
 python distribution_equation.py -d $DIR/$SUBDIR/$TOPOUT -t genes
+python distribution_equation.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG
 python distribution_matrix.py -d $DIR/$SUBDIR/$TOPOUT -t genes
+python distribution_matrix.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG
 
 
 

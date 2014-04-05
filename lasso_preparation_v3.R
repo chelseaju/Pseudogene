@@ -1,9 +1,10 @@
 ########################## lasso_preparation_v2.R #########################
 # Function: read in data (expected Y) and training matrix X from different#
 #         directories. Organize data in two files for lasso training      #
-# Usage: R --no-save < lasso_analysis.R --args dir datatype               #
+# Usage: R --no-save < lasso_analysis.R --args dir datatype rep           #
 # Arguments: dir = input directory (select_one_pseudogene_110)            #
 #            datatype = [gene|transcript]                                 #
+#            rep = number of replicate used                               #
 #            output = lasso_datatype_expected_Y.txt                       #
 #                     lasso_datatype_matrix_X.txt                         #
 # Author: Chelsea Ju                                                      #
@@ -38,16 +39,26 @@ read_expected_data <- function(subdir, filetype, row_order, prefix){
 
 # read in arguments
 options <- commandArgs(trailingOnly = TRUE);
-if(length(options) != 2){
+if(length(options) != 3){
     stop(paste("Invalid Arguments\n",
     "Usage: R--no-save --slave < lasso_trainer.R --args dir type\n",
     "\t dir = directory of input and output\n",
-    "\t type = genes or transcripts\n"),
+    "\t type = genes or transcripts\n",
+    "\t rep = number of replicates\n"),
     sep="");
 }
 
 dir <- options[1];
 type <- options[2];
+replicates <- options[3];
+
+
+if(as.integer(replicates) > 15){
+	stop(paste("Maximum replicates = 15"));
+}
+
+output_training <- paste("LassoTraining_rep", replicates, sep="");
+output_validation <- paste("LassoValidation_rep" , replicates, sep="");
 
 ## for percentage matrix and distribution matrix
 dir_3XR1A <- paste(dir, "/3X_101L_R1A/", sep="")
@@ -133,6 +144,7 @@ x[is.na(x)] <- 0;
 colnames(y) <- c("Gene_Name", "Read_Count");
 rownames(x) <- rownames(y);
 
+
 ## normalize observation matrix against diagnoal value
 diag_values <- c(diag(as.matrix(observed_3XR1A)), diag(as.matrix(observed_5XR1A)), diag(as.matrix(observed_7XR1A)),
 	diag(as.matrix(observed_10XR1A)), diag(as.matrix(observed_13XR1A)), diag(as.matrix(observed_17XR1A)),
@@ -144,19 +156,104 @@ diag_values <- c(diag(as.matrix(observed_3XR1A)), diag(as.matrix(observed_5XR1A)
 ## diag_normalized_x is a 15 sets matrix (2048 x 304)
 diag_normalized_x <- x / diag_values
 
+# number of genes
+gene_count <- nrow(x) / 15
+
+# select a subset of data that represent different coverage
+if(replicates == 3){
+	replicate_index <- c(4,7,10);
+}
+
+if(replicates == 4){
+	replicate_index <- c(4,5, 7,10);
+}
+
+if(replicates == 5){
+	replicate_index <- c(4,5,7,8,10);
+}
+
+if(replicates == 6){
+	replicate_index <- c(4,5,6,7,8,10);
+}
+
+if(replicates == 7){
+	replicate_index <- c(4,5,6,7,8,9,10);
+}
+
+if(replicates == 8){
+	replicate_index <- c(4,5,6,7,8,9,10,11);
+}
+
+if(replicates == 9){
+	replicate_index <- c(3,4,5,6,7,8,9,10,11);
+}
+
+if(replicates == 10){
+	replicate_index <- c(3,4,5,6,7,8,9,10,11,13);
+}
+
+if(replicates == 11){
+	replicate_index <- c(2,3,4,5,6,7,8,9,10,11,13);
+}
+
+if(replicates == 12){
+	replicate_index <- c(2,3,4,5,6,7,8,9,10,11,13,15);
+}
+
+if(replicates == 13){
+	replicate_index <- c(2,3,4,5,6,7,8,9,10,11,12,13,15);
+}
+
+if(replicates == 14){
+	replicate_index <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15);
+}
+
+if(replicates == 15){
+	replicate_index <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+}
+
+final_x <- matrix(0, nrow = as.integer(replicates)*gene_count, ncol = ncol(x))
+final_y <- matrix(0, nrow = as.integer(replicates)*gene_count, ncol = ncol(y))
+final_diag_x <- matrix(0, nrow = as.integer(replicates)*gene_count, ncol = ncol(x))
+final_x_name <- rep(0, as.integer(replicates)*gene_count)
+for (i in 1:replicates){
+	index <- replicate_index[i]
+	start_x <- (index - 1 ) * gene_count + 1
+	end_x <- start_x + gene_count - 1
+
+	start_final_x <- (i - 1) * gene_count + 1
+	end_final_x <- start_final_x + gene_count - 1
+
+	final_x[start_final_x:end_final_x,] <- unlist(x[start_x:end_x,])
+	final_x_name[start_final_x:end_final_x] <- rownames(x)[start_x:end_x]
+
+	final_y[start_final_x:end_final_x,] <- unlist(y[start_x:end_x,])
+	final_diag_x[start_final_x:end_final_x,] <- unlist(diag_normalized_x[start_x:end_x,])
+}
+
+## remove zero columns
+x_sum <- colSums(final_x)
+zero_c <- which(x_sum==0)
+final_x <- final_x[,-zero_c]
+final_diag_x <- final_diag_x[,-zero_c]
+
+rownames(final_x) <- final_x_name
+colnames(final_x) <- colnames(x)[-zero_c]
+rownames(final_y) <- final_x_name
+colnames(final_y) <- colnames(y)
+rownames(final_diag_x) <- final_x_name
+colnames(final_diag_x) <- colnames(x)[-zero_c]
+
 
 # output data
-filename <- c("3XR1A", "5XR1A", "7XR1A", "10XR1A", "13XR1A", "17XR1A", "20XR1A", 
-		"23XR1A", "27XR1A", "30XR1A", "10X1A", "10XR2A", "20X1A","20XR2A", "30XR2A"); 
-gene_count <- nrow(x) / length(filename)
 
-## deflat the diag_normalized_x into 16 rows
+## deflat the diag_normalized_x into 15 rows
 ## each row contains (128 x 304) elements
-diag_normalized_x_in_vector <- matrix(0, nrow=length(filename), ncol=ncol(x)*gene_count)
-for (i in 1:length(filename)){
+diag_normalized_x_in_vector <- matrix(0, nrow=as.integer(replicates), ncol=ncol(final_x)*gene_count)
+for (i in 1:replicates){
 	start <- (i-1)*gene_count + 1;
 	end <- i*gene_count;
-	diag_normalized_x_in_vector[i,] <- unlist(diag_normalized_x[start:end,]) 
+	diag_normalized_x_in_vector[i,] <- unlist(final_diag_x[start:end,]) 
 }
 
 # evaluate consistency : mean, var, median
@@ -166,13 +263,13 @@ diag_normalized_mean <- matrix(apply(diag_normalized_x_in_vector, 2, mean), byro
 diag_normalized_median <- matrix(apply(diag_normalized_x_in_vector, 2, median), byrow = F, nrow = gene_count)
 diag_normalized_var <- matrix(apply(diag_normalized_x_in_vector, 2, var), byrow = F, nrow = gene_count)
 
-rownames(diag_normalized_mean) <- rownames(observed_10X1A)
-rownames(diag_normalized_median) <- rownames(observed_10X1A)
-rownames(diag_normalized_var) <- rownames(observed_10X1A)
+rownames(diag_normalized_mean) <- final_x_name[1:gene_count]
+rownames(diag_normalized_median) <- final_x_name[1:gene_count]
+rownames(diag_normalized_var) <- final_x_name[1:gene_count]
 
-colnames(diag_normalized_mean) <- x_colname
-colnames(diag_normalized_median) <- x_colname
-colnames(diag_normalized_var) <- x_colname
+colnames(diag_normalized_mean) <- colnames(x)[-zero_c]
+colnames(diag_normalized_median) <- colnames(x)[-zero_c]
+colnames(diag_normalized_var) <- colnames(x)[-zero_c]
 
 ## filter data with high variance
 filter_genes <- unique(ceiling(which(diag_normalized_var > 0.05) / gene_count))
@@ -181,9 +278,9 @@ filter_var <- diag_normalized_var[-filter_genes, -filter_genes]
 filter_median <- diag_normalized_median[-filter_genes, -filter_genes]
 
 ## output mean, var, median
-mean_file <- paste(dir,"/LassoTraining_v2/", type, "_matrix_A_Mean.txt", sep="")
-median_file <- paste(dir,"/LassoTraining_v2/", type, "_matrix_A_Median.txt", sep="")
-var_file <- paste(dir,"/LassoTraining_v2/", type, "_matrix_A_Variance.txt", sep="")
+mean_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_Mean.txt", sep="")
+median_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_Median.txt", sep="")
+var_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_Variance.txt", sep="")
 
 write.table(diag_normalized_mean, mean_file, sep="\t")
 write.table(diag_normalized_median, median_file, sep="\t")
@@ -195,9 +292,9 @@ print(paste("Number of variance > 0.05 = ", length(which(diag_normalized_var > 0
 
 
 ## output mean, var, median
-filter_mean_file <- paste(dir,"/LassoTraining_v2/", type, "_matrix_A_MeanFilter.txt", sep="")
-filter_median_file <- paste(dir,"/LassoTraining_v2/", type, "_matrix_A_MedianFilter.txt", sep="")
-filter_var_file <- paste(dir,"/LassoTraining_v2/", type, "_matrix_A_VarianceFilter.txt", sep="")
+filter_mean_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_MeanFilter.txt", sep="")
+filter_median_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_MedianFilter.txt", sep="")
+filter_var_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_VarianceFilter.txt", sep="")
 
 write.table(filter_mean, filter_mean_file, sep="\t")
 write.table(filter_median, filter_median_file, sep="\t")
@@ -210,8 +307,8 @@ validate_10XR3A[is.na(validate_10XR3A)] <- 0;
 validate_10XR3A <- validate_10XR3A[1:gene_count,colnames(diag_normalized_median)];
 rownames(validate_10XR3A) <- rownames(observed_10XR3A);
 
-out_X_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_X.txt", sep="");
-out_Y_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_Y.txt", sep="");
+out_X_10XR3A_file <- paste(dir, "/",output_validation,"/", type, "_10XR3A_validation_X.txt", sep="");
+out_Y_10XR3A_file <- paste(dir, "/",output_validation,"/", type, "_10XR3A_validation_Y.txt", sep="");
 write.table(validate_10XR3A, out_X_10XR3A_file, sep="\t");
 write.table(expected_10XR3A, out_Y_10XR3A_file, sep="\t");
 
@@ -222,8 +319,8 @@ filter_X_10XR3A <- validate_10XR3A[-filter_genes,-filter_genes]
 filter_X_10XR3A <- filter_X_10XR3A[complete.cases(filter_X_10XR3A)]
 filter_Y_10XR3A <- expected_10XR3A[-filter_genes,]
 
-out_filter_X_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_X_filter.txt", sep="");
-out_filter_Y_10XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_10XR3A_validation_Y_filter.txt", sep="");
+out_filter_X_10XR3A_file <- paste(dir, "/",output_validation,"/", type, "_10XR3A_validation_X_filter.txt", sep="");
+out_filter_Y_10XR3A_file <- paste(dir, "/",output_validation,"/", type, "_10XR3A_validation_Y_filter.txt", sep="");
 write.table(filter_X_10XR3A, out_filter_X_10XR3A_file, sep="\t");
 write.table(filter_Y_10XR3A, out_filter_Y_10XR3A_file, sep="\t");
 
@@ -237,8 +334,8 @@ validate_20XR3A[is.na(validate_20XR3A)] <- 0;
 validate_20XR3A <- validate_20XR3A[1:gene_count,colnames(diag_normalized_median)];
 rownames(validate_20XR3A) <- rownames(observed_20XR3A);
 
-out_X_20XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_20XR3A_validation_X.txt", sep="");
-out_Y_20XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_20XR3A_validation_Y.txt", sep="");
+out_X_20XR3A_file <- paste(dir, "/",output_validation,"/", type, "_20XR3A_validation_X.txt", sep="");
+out_Y_20XR3A_file <- paste(dir, "/",output_validation,"/", type, "_20XR3A_validation_Y.txt", sep="");
 write.table(validate_20XR3A, out_X_20XR3A_file, sep="\t");
 write.table(expected_20XR3A, out_Y_20XR3A_file, sep="\t");
 
@@ -249,8 +346,8 @@ filter_X_20XR3A <- validate_20XR3A[-filter_genes,-filter_genes]
 filter_X_20XR3A <- filter_X_20XR3A[complete.cases(filter_X_20XR3A)]
 filter_Y_20XR3A <- expected_20XR3A[-filter_genes,]
 
-out_filter_X_20XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_20XR3A_validation_X_filter.txt", sep="");
-out_filter_Y_20XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_20XR3A_validation_Y_filter.txt", sep="");
+out_filter_X_20XR3A_file <- paste(dir, "/",output_validation,"/", type, "_20XR3A_validation_X_filter.txt", sep="");
+out_filter_Y_20XR3A_file <- paste(dir, "/",output_validation,"/", type, "_20XR3A_validation_Y_filter.txt", sep="");
 write.table(filter_X_20XR3A, out_filter_X_20XR3A_file, sep="\t");
 write.table(filter_Y_20XR3A, out_filter_Y_20XR3A_file, sep="\t");
 
@@ -265,8 +362,8 @@ validate_30XR3A[is.na(validate_30XR3A)] <- 0;
 validate_30XR3A <- validate_30XR3A[1:gene_count,colnames(diag_normalized_median)];
 rownames(validate_30XR3A) <- rownames(observed_30XR3A);
 
-out_X_30XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_30XR3A_validation_X.txt", sep="");
-out_Y_30XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_30XR3A_validation_Y.txt", sep="");
+out_X_30XR3A_file <- paste(dir, "/",output_validation,"/", type, "_30XR3A_validation_X.txt", sep="");
+out_Y_30XR3A_file <- paste(dir, "/",output_validation,"/", type, "_30XR3A_validation_Y.txt", sep="");
 write.table(validate_30XR3A, out_X_30XR3A_file, sep="\t");
 write.table(expected_30XR3A, out_Y_30XR3A_file, sep="\t");
 
@@ -277,8 +374,8 @@ filter_X_30XR3A <- validate_30XR3A[-filter_genes,-filter_genes]
 filter_X_30XR3A <- filter_X_30XR3A[complete.cases(filter_X_30XR3A)]
 filter_Y_30XR3A <- expected_30XR3A[-filter_genes,]
 
-out_filter_X_30XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_30XR3A_validation_X_filter.txt", sep="");
-out_filter_Y_30XR3A_file <- paste(dir, "/LassoValidation_v2/", type, "_30XR3A_validation_Y_filter.txt", sep="");
+out_filter_X_30XR3A_file <- paste(dir, "/",output_validation,"/", type, "_30XR3A_validation_X_filter.txt", sep="");
+out_filter_Y_30XR3A_file <- paste(dir, "/",output_validation,"/", type, "_30XR3A_validation_Y_filter.txt", sep="");
 write.table(filter_X_30XR3A, out_filter_X_30XR3A_file, sep="\t");
 write.table(filter_Y_30XR3A, out_filter_Y_30XR3A_file, sep="\t");
 
@@ -287,11 +384,11 @@ print(paste("Written Data for Validation to ", out_filter_Y_30XR3A_file, sep="")
 
 
 ## output X, Y for beta training
-out_expected_file <- paste(dir, "/LassoTraining_v2/", type, "_lasso_expected_Y.txt", sep="");
-out_training_file <- paste(dir, "/LassoTraining_v2/", type, "_lasso_matrix_X.txt", sep="");
+out_expected_file <- paste(dir, "/",output_training,"/", type, "_lasso_expected_Y.txt", sep="");
+out_training_file <- paste(dir, "/",output_training,"/", type, "_lasso_matrix_X.txt", sep="");
 
-write.table(x, out_training_file, sep="\t");
-write.table(y, out_expected_file, sep="\t");
+write.table(final_x, out_training_file, sep="\t");
+write.table(final_y, out_expected_file, sep="\t");
 
 print(paste("Written the Expected Value (Y) to ", out_expected_file, sep=""));
 print(paste("Written the Training Matrix (X) to ", out_training_file, sep=""));

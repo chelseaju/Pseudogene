@@ -22,9 +22,9 @@ import sys, re, os, subprocess, random, argparse
 
 # HOFFMAN
 DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
-ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
-PARENT_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENST_74.bed"
-PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
+ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENST_74.bed"
+#PARENT_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENSG_74.bed"
+#PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
 
 # MAC
 #ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_74.bed"
@@ -69,6 +69,7 @@ def map_exon_to_gene(input_file, database):
     unknown = []  
 
     if(os.stat(input_file)[6]!=0):
+        print database, input_file
         mapping = subprocess.check_output(["bedtools", "intersect", "-wb", "-loj", "-a", input_file, "-b", database])
         mapping_data = mapping.split("\n")
         
@@ -216,19 +217,19 @@ def main(parser):
 
 
     # map to parent genes
-    (mapped_parents, unknown) = map_exon_to_gene(input_file, PARENT_GENE)
-    export_temp_unknown(unknown, output_temp)
-    export_genes(mapped_parents, output_file, chromosome_name, False)
-
-    # map to pseudo genes
-    (mapped_pseudo, unknown) = map_exon_to_gene(output_temp, PSEUDO_GENE)
-    export_temp_unknown(unknown, output_temp)
-    export_genes(mapped_pseudo, output_file, chromosome_name, True)
-
-    # map to parents and pseudogene
-#    (mapped_parents, unknown) = map_exon_to_gene(input_file, DB)
+#    (mapped_parents, unknown) = map_exon_to_gene(input_file, PARENT_GENE)
 #    export_temp_unknown(unknown, output_temp)
 #    export_genes(mapped_parents, output_file, chromosome_name, False)
+
+    # map to pseudo genes
+#    (mapped_pseudo, unknown) = map_exon_to_gene(output_temp, PSEUDO_GENE)
+#    export_temp_unknown(unknown, output_temp)
+#    export_genes(mapped_pseudo, output_file, chromosome_name, True)
+
+    # map to parents and pseudogene
+    (mapped_parents, unknown) = map_exon_to_gene(input_file, DB)
+    export_temp_unknown(unknown, output_temp)
+    export_genes(mapped_parents, output_file, chromosome_name, False)
 
     # map to all genes
     (mapped_ensembl, unknown) = map_exon_to_gene(output_temp, ENSEMBL_GENE)
