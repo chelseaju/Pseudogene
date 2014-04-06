@@ -7,8 +7,8 @@ READLEN=$3
 ABUNDANCE=$4
 
 
-LASSO_COEFF="lasso_coefficient.txt"
-LASSO_COEFF_LOCUS="lasso_coefficient_locus.txt"
+LASSO_EXPECTATION="lasso_expectation.txt"
+LOCUS_EXPECTATION="locus_expectation.txt"
 
 ## MAC
 BED="/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/ParentENSG_Pseudogene_74.bed"
@@ -21,8 +21,9 @@ BED="/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/ParentENSG_Pseudogene_7
 #ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
 
 ## LAB
+BED="/home/chelseaju/Database/Pseudogene/ParentENSG_Pseudogene_74.bed"
 #ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
 #ENST2ENSG="/home/chelseaju/Database/Ensembl/script/ENST2ENSG.py"
 
 ## merge gene ID with location
-join -1 1 -2 4 <(sort $DIR/$LASSO_COEFF) <(sort -k4 $BED) > $DIR/LASSO_COEFF_LOCUS
+join -t $'\t' -1 2 -2 4 <(sort -k2 $DIR/$LASSO_COEFF) <(sort -k4 $BED) | cut -f1-5 > $DIR/LASSO_COEFF_LOCUS
