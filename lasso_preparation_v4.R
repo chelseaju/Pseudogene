@@ -39,26 +39,16 @@ read_expected_data <- function(subdir, filetype, row_order, prefix){
 
 # read in arguments
 options <- commandArgs(trailingOnly = TRUE);
-if(length(options) != 3){
+if(length(options) != 2){
     stop(paste("Invalid Arguments\n",
     "Usage: R--no-save --slave < lasso_trainer.R --args dir type\n",
     "\t dir = directory of input and output\n",
     "\t type = genes or transcripts\n",
-    "\t rep = number of replicates\n"),
-    sep="");
+    sep=""));
 }
 
 dir <- options[1];
 type <- options[2];
-replicates <- options[3];
-
-
-if(as.integer(replicates) > 16){
-	stop(paste("Maximum replicates = 16"));
-}
-
-output_training <- paste("LassoTraining_rep", replicates, sep="");
-output_validation <- paste("LassoValidation_rep" , replicates, sep="");
 
 ## for percentage matrix and distribution matrix
 dir_3XR1A <- paste(dir, "/3X_101L_R1A/", sep="")
@@ -145,76 +135,15 @@ colnames(y) <- c("Gene_Name", "Read_Count");
 rownames(x) <- rownames(y);
 
 
-## normalize observation matrix against diagnoal value
-diag_values <- c(diag(as.matrix(observed_3XR1A)), diag(as.matrix(observed_5XR1A)), diag(as.matrix(observed_7XR1A)),
-	diag(as.matrix(observed_10XR1A)), diag(as.matrix(observed_13XR1A)), diag(as.matrix(observed_17XR1A)),
-	diag(as.matrix(observed_20XR1A)), diag(as.matrix(observed_23XR1A)), diag(as.matrix(observed_27XR1A)),
-	diag(as.matrix(observed_30XR1A)), diag(as.matrix(observed_10X1A)), diag(as.matrix(observed_10XR2A)),
-	diag(as.matrix(observed_20X1A)), diag(as.matrix(observed_20XR2A)), diag(as.matrix(observed_30X1A)), diag(as.matrix(observed_30XR2A))
-	)
+## normalize observation matrix against expected value
+normed_x <- x / y$Read_Count;
 
-## diag_normalized_x is a 15 sets matrix (2048 x 304)
-diag_normalized_x <- x / diag_values
-
-# number of genes
+## number of genes
 gene_count <- nrow(x) / 16
 
-# select a subset of data that represent different coverage
-if(replicates == 3){
-	replicate_index <- c(4,7,10);
-}
-
-if(replicates == 4){
-	replicate_index <- c(4,5, 7,10);
-}
-
-if(replicates == 5){
-	replicate_index <- c(4,5,7,8,10);
-}
-
-if(replicates == 6){
-	replicate_index <- c(4,5,6,7,8,10);
-}
-
-if(replicates == 7){
-	replicate_index <- c(4,5,6,7,8,9,10);
-}
-
-if(replicates == 8){
-	replicate_index <- c(4,5,6,7,8,9,10,11);
-}
-
-if(replicates == 9){
-	replicate_index <- c(3,4,5,6,7,8,9,10,11);
-}
-
-if(replicates == 10){
-	replicate_index <- c(3,4,5,6,7,8,9,10,11,13);
-}
-
-if(replicates == 11){
-	replicate_index <- c(2,3,4,5,6,7,8,9,10,11,13);
-}
-
-if(replicates == 12){
-	replicate_index <- c(2,3,4,5,6,7,8,9,10,11,13,15);
-}
-
-if(replicates == 13){
-	replicate_index <- c(2,3,4,5,6,7,8,9,10,11,12,13,15);
-}
-
-if(replicates == 14){
-	replicate_index <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,15);
-}
-
-if(replicates == 15){
-	replicate_index <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-}
-
-if(replicates == 16){
-	replicate_index <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
-}
+## convert normed_x as a [sample x obs] matrix (in this case, 16 * 3840)
+##  3840 has 128 genes x 304 regions
+expand_x <- matrix(0, nrow = 16, ncol = gene_count)
 
 
 final_x <- matrix(0, nrow = as.integer(replicates)*gene_count, ncol = ncol(x))
