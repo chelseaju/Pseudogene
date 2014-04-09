@@ -143,100 +143,39 @@ gene_count <- nrow(x) / 16
 
 ## convert normed_x as a [sample x obs] matrix (in this case, 16 * 3840)
 ##  3840 has 128 genes x 304 regions
-expand_x <- matrix(0, nrow = 16, ncol = gene_count)
+expand_x <- matrix(0, nrow = 16, ncol = gene_count * ncol(x))
 
-
-final_x <- matrix(0, nrow = as.integer(replicates)*gene_count, ncol = ncol(x))
-final_y <- matrix(0, nrow = as.integer(replicates)*gene_count, ncol = ncol(y))
-final_diag_x <- matrix(0, nrow = as.integer(replicates)*gene_count, ncol = ncol(x))
-final_x_name <- rep(0, as.integer(replicates)*gene_count)
-for (i in 1:replicates){
-	index <- replicate_index[i]
-	start_x <- (index - 1 ) * gene_count + 1
-	end_x <- start_x + gene_count - 1
-
-	start_final_x <- (i - 1) * gene_count + 1
-	end_final_x <- start_final_x + gene_count - 1
-
-	final_x[start_final_x:end_final_x,] <- unlist(x[start_x:end_x,])
-	final_x_name[start_final_x:end_final_x] <- rownames(x)[start_x:end_x]
-
-	final_y[start_final_x:end_final_x,] <- unlist(y[start_x:end_x,])
-	final_diag_x[start_final_x:end_final_x,] <- unlist(diag_normalized_x[start_x:end_x,])
+for(i in 1:16){
+	start <- ((i - 1) * gene_count) + 1
+	end <- start + gene_count - 1
+	replicates <- unlist(normed_x[start:end,])
+	expand_x[i,] <- replicates
 }
 
-## remove zero columns
-x_sum <- colSums(final_x)
-zero_c <- which(x_sum==0)
-if(length(zero_c) > 0){
-	final_x <- final_x[,-zero_c]
-	final_diag_x <- final_diag_x[,-zero_c]
-}
 
-rownames(final_x) <- final_x_name
-colnames(final_x) <- colnames(x)[-zero_c]
-rownames(final_y) <- final_x_name
-colnames(final_y) <- colnames(y)
-rownames(final_diag_x) <- final_x_name
-colnames(final_diag_x) <- colnames(x)[-zero_c]
+norm_x_mean <- matrix(apply(expand_x, 2, mean), byrow = F, nrow = gene_count)
+norm_x_median <- matrix(apply(expand_x, 2, median), byrow = F, nrow = gene_count)
+norm_x_var <- matrix(apply(expand_x, 2, var), byrow = F, nrow = gene_count)
 
-
-# output data
-
-## deflat the diag_normalized_x into 15 rows
-## each row contains (128 x 304) elements
-diag_normalized_x_in_vector <- matrix(0, nrow=as.integer(replicates), ncol=ncol(final_x)*gene_count)
-for (i in 1:replicates){
-	start <- (i-1)*gene_count + 1;
-	end <- i*gene_count;
-	diag_normalized_x_in_vector[i,] <- unlist(final_diag_x[start:end,]) 
-}
-
-# evaluate consistency : mean, var, median
-# mean, var, median is calculated on a vector 
-# the vector is then expend into matrix (128 x 304)
-diag_normalized_mean <- matrix(apply(diag_normalized_x_in_vector, 2, mean), byrow = F, nrow = gene_count)
-diag_normalized_median <- matrix(apply(diag_normalized_x_in_vector, 2, median), byrow = F, nrow = gene_count)
-diag_normalized_var <- matrix(apply(diag_normalized_x_in_vector, 2, var), byrow = F, nrow = gene_count)
-
-rownames(diag_normalized_mean) <- final_x_name[1:gene_count]
-rownames(diag_normalized_median) <- final_x_name[1:gene_count]
-rownames(diag_normalized_var) <- final_x_name[1:gene_count]
-
-if(length(zero_c) > 0){
-	colnames(diag_normalized_mean) <- colnames(x)[-zero_c]
-	colnames(diag_normalized_median) <- colnames(x)[-zero_c]
-	colnames(diag_normalized_var) <- colnames(x)[-zero_c]
-}else{
-	colnames(diag_normalized_mean) <- colnames(x)
-	colnames(diag_normalized_median) <- colnames(x)
-	colnames(diag_normalized_var) <- colnames(x)	
-}
-
-## filter data with high variance
-#filter_genes <- unique(ceiling(which(diag_normalized_var > 0.05) / gene_count))
-#filter_mean <- diag_normalized_mean[-filter_genes, -filter_genes]
-#filter_var <- diag_normalized_var[-filter_genes, -filter_genes]
-#filter_median <- diag_normalized_median[-filter_genes, -filter_genes]
 
 ## output mean, var, median
 mean_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_Mean.txt", sep="")
 median_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_Median.txt", sep="")
 var_file <- paste(dir,"/",output_training,"/", type, "_matrix_A_Variance.txt", sep="")
 
-write.table(diag_normalized_mean, mean_file, sep="\t")
-write.table(diag_normalized_median, median_file, sep="\t")
-write.table(diag_normalized_var, var_file, sep="\t")
+write.table(norm_x_mean, mean_file, sep="\t")
+write.table(norm_x_median, median_file, sep="\t")
+write.table(norm_x_var, var_file, sep="\t")
 
-print(paste("Maximum variance = ", max(diag_normalized_var), "\n", sep=""));
-print(paste("Minimum variance = ", min(diag_normalized_var), "\n", sep=""));
-print(paste("Number of variance > 0.05 = ", length(which(diag_normalized_var > 0.05)), "\n", sep=""));
+print(paste("Maximum variance = ", max(norm_x_var), "\n", sep=""));
+print(paste("Minimum variance = ", min(norm_x_var), "\n", sep=""));
+print(paste("Number of variance > 0.05 = ", length(which(norm_x_var > 0.05)), "\n", sep=""));
 
 
 ## plot histogram for those metabolites have high variance
-large_variance <- which(diag_normalized_var > 0.05)
+large_variance <- which(norm_x_var > 0.05)
 
-png("test.png")
+png(paste(dir,"/", "variance_plot.png", sep=""), width=880, height=800)
 op <- par(mfrow = c(ceiling(sqrt(length(large_variance))), ceiling(sqrt(length(large_variance)))))
 
 for (i in 1:length(large_variance)){
@@ -245,11 +184,11 @@ for (i in 1:length(large_variance)){
 	c_name <- colnames(x)[ceiling(index / ncol(x))]
 	r_name <- colnames(x)[index %% ncol(x)]
 
-	hist_title <- paste(r_name, c_name, sep="_")
+	hist_title <- paste(r_name, " Fragments Mapped to ", c_name, sep="")
 
-	hist(diag_normalized_x_in_vector[, index], xlab = "Correlation", 
-			main = hist_title, col = "lightgreen")
-	curve(dnorm(x, mean=diag_normalized_mean[index], sd=sd(diag_normalized_x_in_vector[, index])),
+	hist(expand_x[, index], xlab = "Correlation", 
+			main = hist_title, col = "lightgreen", cex.main = 1)
+	curve(dnorm(x, mean=norm_x_mean[index], sd=sd(expand_x[, index])),
 		 add=TRUE, col="darkblue", lwd=2) 
 
 }

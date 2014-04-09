@@ -63,7 +63,7 @@ def main(parser):
 
 if __name__ == "__main__":   
    
-    parser = argparse.ArgumentParser(prog='expected_counter.py')
+    parser = argparse.ArgumentParser(prog='multiread_marker.py')
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
     parser.add_argument("-p", "--paired", dest="pair", type=bool, help="paired end read [True|False]", required = True)
 

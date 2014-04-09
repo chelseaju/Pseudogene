@@ -98,7 +98,7 @@ def main(parser):
     bamfile = dir + "accepted_hits_sorted.bam"
     multiread_file = dir + "multireads.txt"
     output = dir + "multireads_assignment.txt"
-    expected_file = dir + "locus_count.txt"
+    expected_file = dir + "locus_expectation.txt"
 
     import_multiread(multiread_file)
     resolver(bamfile, expected_file)

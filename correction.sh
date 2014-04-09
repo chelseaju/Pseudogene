@@ -26,4 +26,4 @@ BED="/home/chelseaju/Database/Pseudogene/ParentENSG_Pseudogene_74.bed"
 #ENST2ENSG="/home/chelseaju/Database/Ensembl/script/ENST2ENSG.py"
 
 ## merge gene ID with location
-join -t $'\t' -1 2 -2 4 <(sort -k2 $DIR/$LASSO_COEFF) <(sort -k4 $BED) | cut -f1-5 > $DIR/LASSO_COEFF_LOCUS
+join -t $'\t' -1 2 -2 4 <(sort -k2 $DIR/$LASSO_EXPECTATION) <(sort -k4 $BED) | cut -f1-5 > $DIR/$LOCUS_EXPECTATION
