@@ -1,5 +1,5 @@
 """
-Usage: python observed_separator_v2.py -c chromosome_name -d directory -t dataType
+Usage: python observed_separator_v3.py -c chromosome_name -d directory -t dataType
 Input: -d the directory and prefix of output files, -c chromosome name -t dataType[genes or transcripts]
 Output: a file with three columns {original_gene \t mapped_region \t read_count_of_mapped_region} 
 Function: Similar to observed_counter.py, it gathers all the reads for newly identified gene regions,
@@ -7,10 +7,38 @@ Function: Similar to observed_counter.py, it gathers all the reads for newly ide
     Each line in the output file corresponds to one origin and one mapped region, and the same origin may have multiple mapped regions. 
 
 Date: 2014-01-08
+Last Update: 2014-04-18
 Author: Chelsea Ju
 """
 
 import sys, re, pysam, os, random, argparse
+
+"""
+    Function: iterate through the list of candidate genes, if any of these genes overlaps
+        select the best representative
+"""
+def overlap_filter(input):
+
+    final_gene_list = []
+    gene_fh = open(input, 'rb')
+
+    gene_list = [(line.strip().split("\t")) for line in gene_fh]
+    gene_list = sorted(gene_list, key = lambda gene_list: (gene_list[1], gene_list[2]))
+
+    previous_start = 0
+    previous_end = 0
+    previous_chr = 0
+
+    for gene in gene_fh:
+        (ids, chr, start, end, quality) = gene.rstrip().split("\t")
+
+        if(chr == previous_chr):
+
+        else:
+            previous_chr = chr
+            previous_start = start
+            previous_end = end
+
 
 """
     Function: iterate through each gene (from gene_file)
@@ -92,13 +120,16 @@ def main(parser):
     ## input file
     input_gene_file = dir + "mapping/" + chromosome_name + "_" + dataType + ".txt"    
   
+    ## filter out overlapped genes
+    genes_to_count = overlap_filter(input_gene_file)
 
+    print genes_to_count
     ## start counting the read
-    distribution = observed_read_separator(sorted_input, input_gene_file, chromosome_name)
+#    distribution = observed_read_separator(sorted_input, genes_to_count, chromosome_name)
           
     ## output data
-    outfile = dir + "mapping/" + chromosome_name + "_" + dataType + "_distribution.txt"
-    export_array(distribution, outfile)
+#    outfile = dir + "mapping/" + chromosome_name + "_" + dataType + "_distribution.txt"
+#    export_array(distribution, outfile)
 
 
 
