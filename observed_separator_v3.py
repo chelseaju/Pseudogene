@@ -14,45 +14,40 @@ Author: Chelsea Ju
 import sys, re, pysam, os, random, argparse
 
 """
-    Function: iterate through the list of candidate genes, if any of these genes overlaps
-        select the best representative
+    Function: iterate through the list of candidate genes, if any of these genes have few
+    read evidence, remove them
 """
-def overlap_filter(input):
+def gene_filter(input):
 
     final_gene_list = []
     gene_fh = open(input, 'rb')
 
     gene_list = [(line.strip().split("\t")) for line in gene_fh]
-    gene_list = sorted(gene_list, key = lambda gene_list: (gene_list[1], gene_list[2]))
+#    gene_list = sorted(gene_list, key = lambda gene_list: (gene_list[1], gene_list[2]))
 
-    previous_start = 0
-    previous_end = 0
-    previous_chr = 0
+#    previous_start = 0
+#    previous_end = 0
+#    previous_chr = 0
 
-    for gene in gene_fh:
-        (ids, chr, start, end, quality) = gene.rstrip().split("\t")
-
-        if(chr == previous_chr):
-
-        else:
-            previous_chr = chr
-            previous_start = start
-            previous_end = end
-
+    for gene in gene_list:
+        (ids, chr, start, end, quality) = gene
+        if(int(end) - int(start) > 300):
+            final_gene_list.append((ids, chr, start, end, quality))
+    
+    gene_fh.close()
+    return final_gene_list
 
 """
-    Function: iterate through each gene (from gene_file)
+    Function: iterate through each gene (from gene_list)
         and separate reads that cover this gene region based on the origin of the reads
 """
-def observed_read_separator(sorted_bam, gene_file, chromosome_name):
+def observed_read_separator(sorted_bam, gene_list, chromosome_name):
 
     distribution_array = []
-    gene_fh = open(gene_file, 'rb')
     sorted_bam_fh = pysam.Samfile(sorted_bam)
     
-    for gene in gene_fh:
-        gene = gene.rstrip()
-        (ids, chr, start, end, quality) = gene.split("\t")        
+    for gene in gene_list:
+        (ids, chr, start, end, quality) = gene    
         unique_origin = {}
         
         # fetch the read in that region
@@ -70,8 +65,6 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
                     tmp_hash[name] = ""
                     unique_origin[prefix] = tmp_hash
    
-            if(int(read.pos) >= int(start)):
-                print ids, name, start, end, read.pos, read.aend
 
          # copy the information from unique_origin to distribution_array           
         for k, v in unique_origin.items():
@@ -86,7 +79,6 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
                 distribution_array.append((k, isoform_names[best_index], len(v)))
          
     sorted_bam_fh.close()
-    gene_fh.close()
 
     return distribution_array
 
@@ -120,16 +112,15 @@ def main(parser):
     ## input file
     input_gene_file = dir + "mapping/" + chromosome_name + "_" + dataType + ".txt"    
   
-    ## filter out overlapped genes
-    genes_to_count = overlap_filter(input_gene_file)
+    ## filter out genes with little read evidence 
+    genes_to_count = gene_filter(input_gene_file)
 
-    print genes_to_count
     ## start counting the read
-#    distribution = observed_read_separator(sorted_input, genes_to_count, chromosome_name)
+    distribution = observed_read_separator(sorted_input, genes_to_count, chromosome_name)
           
     ## output data
-#    outfile = dir + "mapping/" + chromosome_name + "_" + dataType + "_distribution.txt"
-#    export_array(distribution, outfile)
+    outfile = dir + "mapping/" + chromosome_name + "_" + dataType + "_distribution.txt"
+    export_array(distribution, outfile)
 
 
 
