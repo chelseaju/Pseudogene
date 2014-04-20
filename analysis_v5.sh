@@ -63,7 +63,7 @@ do
   
   python exon_identifier_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
   python gene_identifier_v3.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr}
-  python observed_separator_v2.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
+  python observed_separator_v3.py -d $DIR/$SUBDIR/$TOPOUT -c ${chr} -t genes
   python $ENST2ENSG -d $ENST_ENSG_ENSP -i $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_genes_distribution.txt -o $DIR/$SUBDIR/$TOPOUT/mapping/${chr}_ENSG_distribution.txt
 
   # merge the same ENSG

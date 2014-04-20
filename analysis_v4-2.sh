@@ -86,8 +86,8 @@ python unknown_unifier.py -o $DIR -t ENSG -d $DIR/$X3A1/$TOPOUT/ $DIR/$X3A5/$TOP
 
 echo ""
 echo "Step 2: Prepare Data for Lasso"
-mkdir -p $DIR/LassoTraining
-R --no-save --slave < lasso_preparation.R --args $DIR ENSG
+#mkdir -p $DIR/LassoTraining
+#R --no-save --slave < lasso_preparation.R --args $DIR ENSG
 
 echo ""
 echo "Step 3: Training Coefficient with Lasso"
