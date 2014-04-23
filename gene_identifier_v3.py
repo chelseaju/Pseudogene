@@ -69,7 +69,6 @@ def map_exon_to_gene(input_file, database):
     unknown = []  
 
     if(os.stat(input_file)[6]!=0):
-        print database, input_file
         mapping = subprocess.check_output(["bedtools", "intersect", "-wb", "-loj", "-a", input_file, "-b", database])
         mapping_data = mapping.split("\n")
         
@@ -90,24 +89,28 @@ def map_exon_to_gene(input_file, database):
                     unknown.append("%s\t%s\t%s\n" %(data[0], data[1], data[2])) # keep the unmapped read from bam
 
 
-        # remove overlap genes : some genes have overlapped positions. this step is to select the best matched gene
-        previous_gene = (0,0,0,0)  #(name, start, end, coverage)
+        # remove overlap genes : some genes have overlapped positions. this step is to list out all possible matched gene
+        previous_gene = (0,0,0,0)  #(name, start, end, gene_region)
         for k in sorted(gene_list.items(), key = lambda x: x[1][0]):
             # k = (NAME, (ensembl_start, ensembl_end, exon_start, exon_end))
-            coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / (float(k[1][1]) - float(k[1][0]))
+            ##coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / (float(k[1][1]) - float(k[1][0]))
+            #coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / max((float(k[1][1]) - float(k[1][0])), float(k[1][3]) - float(k[1][2]))
 
-             # check for overlap
+            # check for overlap
             if(k[1][0] >= previous_gene[1] and k[1][0] <= previous_gene[2]):    # since the list is sorted, only check the starting position against previous stored record
 
-                previous_gene =(previous_gene[0]+"/"+k[0], min(previous_gene[1], k[1][2]), max(previous_gene[2], k[1][3]), str(previous_gene[3])+"/"+str(coverage))
-                
+#                previous_gene =(previous_gene[0]+"/"+k[0], min(previous_gene[1], k[1][2]), max(previous_gene[2], k[1][3]), str(previous_gene[3])+"/"+str(coverage))
+                previous_gene =(previous_gene[0]+"/"+k[0], min(previous_gene[1], k[1][2]), max(previous_gene[2], k[1][3]), previous_gene[3]+"/"+str(k[1][0])+"-"+str(k[1][1]))
+                 
 #                previous_gene =(previous_gene[0]+"/"+k[0], str(previous_gene[1])+"/"+str(k[1][2]), str(previous_gene[2])+"/"+str(k[1][3]), str(previous_gene[3])+"/"+str(coverage))
+
 
             else:
                 if(previous_gene[3] > 0):   # remove extremely low coverage gene or zero entries
                     final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3]))
 
-                previous_gene = (k[0], k[1][2], k[1][3], coverage)
+#                previous_gene = (k[0], k[1][2], k[1][3], coverage)
+                previous_gene = (k[0], k[1][2], k[1][3], str(k[1][0])+"-"+str(k[1][1]))
 
 
         #     coverage = (min(float(k[1][1]), float(k[1][3])) - max(float(k[1][0]), float(k[1][2]))) / (float(k[1][1]) - float(k[1][0]))

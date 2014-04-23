@@ -14,8 +14,10 @@ Author: Chelsea Ju
 import sys, re, pysam, os, random, argparse
 
 """
-    Function: iterate through the list of candidate genes, if any of these genes have few
-    read evidence, remove them
+    Function: iterate through the list of candidate genes and filer out the ambigious mapped genes
+        Ambigious gene is defined as:
+        - having too few reads covering the region (ie less than 300 bp) 
+        - have low coverage if it is an overlapped gene
 """
 def gene_filter(input):
 
@@ -30,9 +32,29 @@ def gene_filter(input):
 #    previous_chr = 0
 
     for gene in gene_list:
-        (ids, chr, start, end, quality) = gene
+        (ids, chr, start, end, region) = gene
+
+        id_list = ids.split("/")
+        region_list = region.split("/")
+        best_coverage = 0
+        best_id = ""
+
+        # select the best coverage if the region contains overlapped genes
+        for i in xrange(0,len(id_list)):
+            gene_id = id_list[i]
+            (gene_start, gene_end) = region_list[i].split("-")
+
+            coverage = (min(float(gene_end), float(end)) - max(float(gene_start), float(start))) / max(float(gene_end) - float(gene_start), float(end) - float(start))
+
+            if(coverage > best_coverage):
+                best_coverage = coverage
+                best_id = gene_id
+
+        # remove gene covered with only a few reads
         if(int(end) - int(start) > 300):
-            final_gene_list.append((ids, chr, start, end, quality))
+            final_gene_list.append((best_id, chr, start, end, best_coverage))
+
+
     
     gene_fh.close()
     return final_gene_list
@@ -68,15 +90,15 @@ def observed_read_separator(sorted_bam, gene_list, chromosome_name):
 
          # copy the information from unique_origin to distribution_array           
         for k, v in unique_origin.items():
+            distribution_array.append((k, ids, len(v)))
+#            isoform_names = ids.split("/")
+#            isoform_quality = quality.split("/")
 
-            isoform_names = ids.split("/")
-            isoform_quality = quality.split("/")
-
-            if(k in isoform_names):
-                distribution_array.append((k, k, len(v)))
-            else:
-                best_index = isoform_quality.index(max(isoform_quality))
-                distribution_array.append((k, isoform_names[best_index], len(v)))
+#            if(k in isoform_names):
+#                distribution_array.append((k, k, len(v)))
+#            else:
+#                best_index = isoform_quality.index(max(isoform_quality))
+#                distribution_array.append((k, isoform_names[best_index], len(v)))
          
     sorted_bam_fh.close()
 
