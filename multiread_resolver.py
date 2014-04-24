@@ -76,8 +76,7 @@ def resolver(bamfile, expected, pairend):
 
 		if(pairend):
 			count = count * 2
-		if(name == "PGOHUM00000258652"):
-			query_reads(chromosome, start, end, int(round(count)), bamFH)
+		query_reads(chromosome, start, end, int(round(count)), bamFH)
 
 	bamFH.close()
 	fh.close() 
@@ -86,10 +85,23 @@ def resolver(bamfile, expected, pairend):
 	Function : read in a list of multireads name
 """
 def import_multiread(file):
-	fh = open(file, 'r')
+	fh = open(file, 'rb')
 	for line in fh:
 		line = line.strip()
 		ASSIGNMENT[line] = ""
+	fh.close()
+
+"""
+	Function : export multireads assignment
+"""
+def export_multiread(file):
+	fh = open(file, 'w')
+	for key in ASSIGNMENT.keys():
+		if(ASSIGNMENT[key] != ""):
+			(chr, start, end) = ASSIGNMENT[key]
+			fh.write("%s\t%s\t%s\t%s\n" %(key, chr, start, end))
+		else:
+			fh.write("%s\n" %(key))
 	fh.close()
 
 def main(parser):
@@ -105,11 +117,15 @@ def main(parser):
     bamfile = dir + "accepted_hits_sorted.bam"
     multiread_file = dir + "multireads.txt"
     output = dir + "multireads_assignment.txt"
-    expected_file = dir + "locus_count.txt"
+    expected_file = dir + "locus_expectation.txt"
+    assignment_file = dir + "multireads_assignment.txt"
 
     import_multiread(multiread_file)
     resolver(bamfile, expected_file, pairend)
+    export_multiread(assignment_file)
 
+    print ""
+    print "Writing Multiread Assignment to File : %s" %(assignment_file)    
 
 if __name__ == "__main__":   
    
