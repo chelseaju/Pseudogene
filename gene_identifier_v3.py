@@ -15,14 +15,14 @@ import sys, re, os, subprocess, random, argparse
 
 
 # LAB
-DB = "/home/chelseaju/Database/Pseudogene/ParentENSG_Pseudogene_74.bed"
-ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENSG_74.bed"
+#DB = "/home/chelseaju/Database/Pseudogene/ParentENSG_Pseudogene_74.bed"
+#ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENSG_74.bed"
 #PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
 #PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
 
 # HOFFMAN
-#DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENSG_Pseudogene_74.bed"
-#ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
+DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENSG_Pseudogene_74.bed"
+ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
 #PARENT_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENSG_74.bed"
 #PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
 
@@ -155,7 +155,7 @@ def collapse_unknown_region(unknown):
             # export unknown region
             if(unknown_collapse[3] > 0):
                 name = "Unknown_" + str(unknown_collapse[0]) + "_" + str(unknown_collapse[1]) + "_" + str(unknown_collapse[2])
-                final_list.append((name, unknown_collapse[1], unknown_collapse[2], 1.0))
+                final_list.append((name, unknown_collapse[1], unknown_collapse[2], str(unknown_collapse[1]) + "-" + str(unknown_collapse[2])))
 
             # new region
             unknown_collapse = (u[0], u[1], u[2], 1)
@@ -167,7 +167,7 @@ def collapse_unknown_region(unknown):
     # export the last one
     if(unknown_collapse[3] > 0):
         name = "Unknown_" + str(unknown_collapse[0]) + "_" + str(unknown_collapse[1]) + "_" + str(unknown_collapse[2])
-        final_list.append((name, unknown_collapse[1], unknown_collapse[2], 1.0))
+        final_list.append((name, unknown_collapse[1], unknown_collapse[2], str(unknown_collapse[1]) + "-" + str(unknown_collapse[2])))
 
     return final_list
 """

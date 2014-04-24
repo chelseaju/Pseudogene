@@ -33,7 +33,6 @@ def gene_filter(input):
 
     for gene in gene_list:
         (ids, chr, start, end, region) = gene
-
         id_list = ids.split("/")
         region_list = region.split("/")
         best_coverage = 0
@@ -51,10 +50,8 @@ def gene_filter(input):
                 best_id = gene_id
 
         # remove gene covered with only a few reads
-        if(int(end) - int(start) > 300):
+        if(int(end) - int(start) > 110):
             final_gene_list.append((best_id, chr, start, end, best_coverage))
-
-
     
     gene_fh.close()
     return final_gene_list
@@ -68,7 +65,7 @@ def observed_read_separator(sorted_bam, gene_list, chromosome_name):
     distribution_array = []
     sorted_bam_fh = pysam.Samfile(sorted_bam)
     
-    for gene in gene_list:
+    for gene in gene_list:        
         (ids, chr, start, end, quality) = gene    
         unique_origin = {}
         
