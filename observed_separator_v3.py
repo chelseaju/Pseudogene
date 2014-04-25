@@ -44,6 +44,7 @@ def gene_filter(input):
             (gene_start, gene_end) = region_list[i].split("-")
 
             coverage = (min(float(gene_end), float(end)) - max(float(gene_start), float(start))) / max(float(gene_end) - float(gene_start), float(end) - float(start))
+            print gene_id, coverage
 
             if(coverage > best_coverage):
                 best_coverage = coverage
@@ -68,7 +69,7 @@ def observed_read_separator(sorted_bam, gene_list, chromosome_name):
     for gene in gene_list:        
         (ids, chr, start, end, quality) = gene    
         unique_origin = {}
-        
+
         # fetch the read in that region
         for read in sorted_bam_fh.fetch(chromosome_name, int(start), int(end)): # start and end are 0-based
             name = read.qname
