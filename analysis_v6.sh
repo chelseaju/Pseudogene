@@ -1,7 +1,7 @@
 #!/bin/bash
 
-## bash analysis_v4.sh DIR COVERAGE READLEN ABUNDANCE
-## ex bash analysis_v4.sh select_one_pseudogene_110 1 100 10
+## bash analysis_v6.sh DIR COVERAGE READLEN ABUNDANCE
+## ex bash analysis_v6.sh select_one_pseudogene_110 1 100 10
 
 DIR=$1
 COVERAGE=$2
@@ -14,13 +14,14 @@ CHROMOSOME=('1' '2' '3' '4' '5' '6' '7' '8'
 	'9' '10' '11' '12' '13' '14' '15' '16'
 	'17' '18' '19' '20' '21' '22' 'X' 'Y' 'MT')
 
+
 ## MAC
-#ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
-#ENST2ENSG="/home/chelseaju/Database/Ensembl/script/ENST2ENSG.py"
+ENST_ENSG_ENSP="/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_ENSG_ENSP_74.txt"
+ENST2ENSG="/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/script/ENST2ENSG.py"
 
 ## HOFFMAN
-ENST_ENSG_ENSP="/u/home/c/chelseaj/project/database/Ensembl/ENST_ENSG_ENSP_74.txt"
-ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
+#ENST_ENSG_ENSP="/u/home/c/chelseaj/project/database/Ensembl/ENST_ENSG_ENSP_74.txt"
+#ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
 
 ## LAB
 #ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
@@ -28,7 +29,7 @@ ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
 
 #CHROMOSOME=('chr1' 'chr2')
 
-echo "Data Analysis Version 5:"
+echo "Data Analysis Version 6:"
 
 echo ""
 echo "Step 1 - Creating Folder"
@@ -49,8 +50,8 @@ echo ""
 echo "Step 1: Read Counts for Genes"
 
 # expect read count
-python expected_counter_v2.py -d $DIR/$SUBDIR/$TOPOUT
-python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.txt -o $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt -d $ENST_ENSG_ENSP
+python expected_counter_v3.py -d $DIR/$SUBDIR/$TOPOUT
+python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/transcripts_expected_read_count.txt -o $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.txt -d $ENST_ENSG_ENSP
 
 # merge the same ENSG
 cp $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup
@@ -73,9 +74,7 @@ done
 
 # observed read distribution
 python distribution_equation.py -d $DIR/$SUBDIR/$TOPOUT -t genes
-python distribution_equation.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG
 python distribution_matrix.py -d $DIR/$SUBDIR/$TOPOUT -t genes
-python distribution_matrix.py -d $DIR/$SUBDIR/$TOPOUT -t ENSG
 
 
 

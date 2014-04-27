@@ -42,7 +42,6 @@ def equation_RHS(input):
     for line in input_fh:
         line = line.rstrip()
         (origin, mapped, count) = line.split("\t")
-
         EQUATION_HASH[origin].append((int(count), mapped))
     input_fh.close()
 

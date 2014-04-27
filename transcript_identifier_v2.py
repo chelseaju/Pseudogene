@@ -13,8 +13,8 @@ Author: Chelsea Ju
 import sys, re, os, subprocess, random, argparse, datetime
 
 # LAB
-DB = "/home/chelseaju/Database/Pseudogene/ParentENST_Pseudogene_74.bed"
-ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
+#DB = "/home/chelseaju/Database/Pseudogene/ParentENST_Pseudogene_74.bed"
+#ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
 #PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
 
@@ -25,7 +25,8 @@ ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
 #PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
 
 # MAC
-#ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_74.bed"
+DB = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/ParentENST_Pseudogene_74.bed"
+ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/Parent_ENST_74.bed"
 #PSEUDO_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/Pseudogene_74.bed"
 
