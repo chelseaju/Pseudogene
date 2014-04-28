@@ -11,7 +11,7 @@ Last Update: 2014-04-18
 Author: Chelsea Ju
 """
 
-import sys, re, pysam, os, random, argparse
+import sys, re, pysam, os, random, argparse, datetime
 
 
 """
