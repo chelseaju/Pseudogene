@@ -54,8 +54,8 @@ python expected_counter_v3.py -d $DIR/$SUBDIR/$TOPOUT
 python $ENST2ENSG -i $DIR/$SUBDIR/$TOPOUT/transcripts_expected_read_count.txt -o $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.txt -d $ENST_ENSG_ENSP
 
 # merge the same ENSG
-cp $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup
-awk '{A[$1]+=$2; next} END{for (i in A) {print i"\t"A[i]}}' $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.backup > $DIR/$SUBDIR/$TOPOUT/ENSG_expected_read_count.txt
+cp $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.txt $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.backup
+awk '{A[$1]+=$2; next} END{for (i in A) {print i"\t"A[i]}}' $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.backup > $DIR/$SUBDIR/$TOPOUT/genes_expected_read_count.txt
 
 for chr in "${CHROMOSOME[@]}"
 do
