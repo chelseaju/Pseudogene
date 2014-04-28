@@ -15,6 +15,14 @@ import sys, re, pysam, os, random, argparse
 
 
 """
+    Function : helper function to output message with time
+"""
+def echo(msg):
+    print "[%s] %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str(msg))
+
+
+
+"""
     Function: iterate through each gene (from gene_list)
         and separate reads that cover this gene region based on the origin of the reads
 """
@@ -61,8 +69,8 @@ def export_array(array, outfile):
         out_fh.write("%s\t%s\t%d\n" %(origin, mapped, count))
     
     out_fh.close()
-    print ""
-    print "Writing Read Distribution to File : %s" %(outfile)    
+
+    echo("Writing Read Distribution to File : %s" %(outfile))
 
 
 def main(parser):

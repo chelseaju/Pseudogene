@@ -13,8 +13,8 @@ Author: Chelsea Ju
 import sys, re, os, subprocess, random, argparse, datetime
 
 # LAB
-DB = "/home/chelseaju/Database/Pseudogene/ParentENST_Pseudogene_74.bed"
-ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
+#DB = "/home/chelseaju/Database/Pseudogene/ParentENST_Pseudogene_74.bed"
+#ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
 #PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
 
@@ -111,17 +111,13 @@ def map_exon_to_gene(input_file, database):
 
             # k = (GENENAME_MAPPEDNAME => (gene_name, ensembl_start, ensembl_end, exon_start, exon_end))
             (gene_name, mapped_name) = k[0].split("_")
-            print gene_name, mapped_name
             coverage = (min(float(k[1][2]), float(k[1][4])) - max(float(k[1][1]), float(k[1][3]))) / max((float(k[1][2]) - float(k[1][1])), float(k[1][4]) - float(k[1][3]))
 
             # check for overlap - same gene name, overlapped positions
             if(gene_name == previous_gene[0] and k[1][1] >= previous_gene[2] and k[1][1] <= previous_gene[3]): # since the list is sorted, only check the starting position against previous stored record
-                print "%s overlap" %(gene_name)
                 # replace previous gene only if the names do not match and coverage is better than previous gene
                 if(previous_gene[0] != previous_gene[1] and coverage < previous_gene[4]):
                     previous_gene = (gene_name, mapped_name, k[1][1], k[1][2], k[1][3], k[1][4], coverage)
-                    print "%s previous_gene_0 %s, previous_gene_1" %(previous_gene[0], previous_gene[1])
-                    print "%s replace" %(gene_name)
 
             else:
                 #output previous gene if not ""

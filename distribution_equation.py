@@ -9,7 +9,7 @@ Author: Chelsea Ju
 Date: 2014-01-08
 """
 
-import sys, re, os, random, argparse, glob
+import sys, re, os, random, argparse, glob, datetime
 
 # Each item contains an array of information. 
 # The first element is the expected count, and the following elements are tuples of (count, mapped_region)

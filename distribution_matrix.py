@@ -7,7 +7,7 @@ Function: Reformat the data from distribution.eqn to matix
 Author: Chelsea Ju
 Date: 2014-01-09
 """
-import sys, re, os, random, argparse, glob
+import sys, re, os, random, argparse, glob, datetime
 
 
 IDs = {} # ID => Index
