@@ -16,6 +16,13 @@ import sys, re, os, random, argparse, glob
 EQUATION_HASH = {}
 
 """
+    Function : helper function to output message with time
+"""
+def echo(msg):
+    print "[%s] %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str(msg))
+
+
+"""
     Function: initiate the equation hash by building the LHS of the equation
         ie     X * ORIGIN = RHS
 """
@@ -62,8 +69,8 @@ def export_data(output):
             output_fh.write("\n")
     
     output_fh.close()
-    print ""
-    print "Writing Distribution Equation: %s" %(output)
+    
+    echo("Writing Distribution Equation: %s" %(output))
     
 def main(parser):
     

@@ -13,6 +13,13 @@ import sys, re, os, random, argparse, glob
 IDs = {} # ID => Index
 
 """
+    Function : helper function to output message with time
+"""
+def echo(msg):
+    print "[%s] %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str(msg))
+
+
+"""
     Function: determine the size an ID of the matrix
         matrix size should be N x M, where N is the number of original regions, and M is the number of mapped
         usually M > N
@@ -96,8 +103,7 @@ def construct_export_matrix(input, output):
     in_fh.close()
     out_fh.close()
 
-    print ""
-    print "Writing Distribution Matrix: %s" %(output)
+    echo("Writing Distribution Matrix: %s" %(output))
  
 
 def main(parser):
