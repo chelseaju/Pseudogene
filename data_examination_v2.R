@@ -60,7 +60,7 @@ coverage <- options[4];
 ## for percentage matrix and distribution matrix
 
 depth <- c("3X", "5X", "7X", "10X", "13X", "17X", "20X", "23X", "27X", "30X");
-expression <- c("1A", "5A", "10A", "R1A", "R2A", "R3A");
+expression <- c("5A", "10A", "R1A", "R2A", "R3A");
 
 
 if(abundance == "all" && coverage == "all"){
@@ -78,6 +78,8 @@ if(abundance == "all" && coverage == "all"){
 	stop(paste("Needs more matrices\n"))
 }
 
+rm(y);
+rm(x);
 
 ## combind data
 for (suffix in directory){
@@ -113,6 +115,10 @@ normed_x <- x / y$Read_Count;
 
 ## number of genes
 gene_count <- nrow(x) / length(directory)
+
+if(gene_count %% 1 != 0){
+	stop("Gene Count Error");
+}
 
 ## convert normed_x as a [sample x obs] matrix (in this case, 16 * 3840)
 ##  3840 has 128 genes x 304 regions
@@ -163,13 +169,18 @@ op <- par(mfrow = c(ceiling(sqrt(length(large_variance))), ceiling(sqrt(length(l
 for (i in 1:length(large_variance)){
 	index <- large_variance[i]
 
-	c_name <- colnames(x)[ceiling(index / ncol(x))]
-	r_name <- colnames(x)[index %% ncol(x)]
+	r_index <- index %% gene_count
+	c_index <- ceiling(index / gene_count)
+	if(r_index == 0){
+		r_index = gene_count
+	}
+	r_name <- colnames(x)[r_index]
+	c_name <- colnames(x)[c_index]
 
-	hist_title <- paste(r_name, " Mapped to ", c_name, sep="")
+	hist_title <- paste(r_name, "-", c_name, sep="")
 
 	hist(expand_x[, index], xlab = "Correlation", 
-			main = hist_title, col = "lightgreen", cex.main = 0.8)
+			main = hist_title, col = "lightgreen", cex.main = 1.5)
 	curve(dnorm(x, mean=norm_x_mean[index], sd=sd(expand_x[, index])),
 		 add=TRUE, col="darkblue", lwd=2) 
 
