@@ -13,14 +13,14 @@ Author: Chelsea Ju
 import sys, re, os, subprocess, random, argparse, datetime
 
 # LAB
-#DB = "/home/chelseaju/Database/Pseudogene/ParentENST_Pseudogene_74.bed"
-#ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
+DB = "/home/chelseaju/Database/Pseudogene/ParentENST_Pseudogene_74.bed"
+ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
 #PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
 
 # HOFFMAN
-DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
-ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENST_74.bed"
+#DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
+#ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENSG_74.bed"
 #PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
 
@@ -122,14 +122,16 @@ def map_exon_to_gene(input_file, database):
             else:
                 #output previous gene if not ""
                 if(previous_gene[0] != ""):
-                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[4], previous_gene[5]))
+#                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[4], previous_gene[5]))
+                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3]))
 
                 previous_gene = (gene_name, mapped_name, k[1][1], k[1][2], k[1][3], k[1][4], coverage)
 
 
         # put last item into list
         if(previous_gene[0] != ""):
-            final_list.append((previous_gene[0], previous_gene[1], previous_gene[4], previous_gene[5]))
+#            final_list.append((previous_gene[0], previous_gene[1], previous_gene[4], previous_gene[5]))
+            final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3]))
 
     return (final_list, unknown)
 

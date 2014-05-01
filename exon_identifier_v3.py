@@ -103,7 +103,7 @@ def mark_position(bam, chromosome_name):
 
         prefix_match = re.match(r"(.*?):.*", read_name)
         if(prefix_match):
-            prefix = prefix_match.group(1)
+            prefix = prefix_match.group(1)            
             position_array.append((prefix, int(read.positions[0])+1, int(read.positions[-1])+1))             # bamfile is zero based
 
     return position_array
