@@ -69,7 +69,8 @@ def export_array(array, outfile):
     out_fh = open(outfile, "w")
 
     for (origin, mapped, count) in array:
-        out_fh.write("%s\t%s\t%d\n" %(origin, mapped, count))
+        if(count > 0):
+            out_fh.write("%s\t%s\t%d\n" %(origin, mapped, count))
     
     out_fh.close()
 

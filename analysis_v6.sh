@@ -16,12 +16,12 @@ CHROMOSOME=('1' '2' '3' '4' '5' '6' '7' '8'
 
 
 ## MAC
-#ENST_ENSG_ENSP="/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_ENSG_ENSP_74.txt"
-#ENST2ENSG="/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/script/ENST2ENSG.py"
+ENST_ENSG_ENSP="/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_ENSG_ENSP_74.txt"
+ENST2ENSG="/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/script/ENST2ENSG.py"
 
 ## HOFFMAN
-ENST_ENSG_ENSP="/u/home/c/chelseaj/project/database/Ensembl/ENST_ENSG_ENSP_74.txt"
-ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
+#ENST_ENSG_ENSP="/u/home/c/chelseaj/project/database/Ensembl/ENST_ENSG_ENSP_74.txt"
+#ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
 
 ## LAB
 #ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
