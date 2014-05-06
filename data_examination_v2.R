@@ -60,7 +60,7 @@ coverage <- options[4];
 ## for percentage matrix and distribution matrix
 
 depth <- c("3X", "5X", "7X", "10X", "13X", "17X", "20X", "23X", "27X", "30X");
-expression <- c("5A", "10A", "R1A", "R2A", "R3A");
+expression <- c("4A", "6A", "8A", "R1A", "R2A", "R3A");
 
 
 if(abundance == "all" && coverage == "all"){
