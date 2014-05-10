@@ -10,7 +10,7 @@ Date: 2014-03-11
 
 import sys, os, re, argparse, random
 
-MIN = 1
+MIN = 3
 MAX = 20
 
 """

@@ -115,8 +115,9 @@ def map_exon_to_gene(input_file, database):
 
             # check for overlap - same gene name, overlapped positions
             if(gene_name == previous_gene[0] and k[1][1] >= previous_gene[2] and k[1][1] <= previous_gene[3]): # since the list is sorted, only check the starting position against previous stored record
+                
                 # replace previous gene only if the names do not match and coverage is better than previous gene
-                if(previous_gene[0] != previous_gene[1] and coverage < previous_gene[4]):
+                if(previous_gene[0] != previous_gene[1] and (gene_name == mapped_name or coverage > previous_gene[6])):
                     previous_gene = (gene_name, mapped_name, k[1][1], k[1][2], k[1][3], k[1][4], coverage)
 
             else:
