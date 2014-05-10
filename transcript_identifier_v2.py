@@ -19,14 +19,14 @@ import sys, re, os, subprocess, random, argparse, datetime
 #PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
 
 # HOFFMAN
-#DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
-#ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENST_74.bed"
+DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
+ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENSG_74.bed"
 #PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
 
 # MAC
-DB = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/ParentENST_Pseudogene_74.bed"
-ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_74.bed"
+#DB = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/ParentENST_Pseudogene_74.bed"
+#ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_74.bed"
 #PARENT_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/Parent_ENST_74.bed"
 #PSEUDO_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/Pseudogene_74.bed"
 

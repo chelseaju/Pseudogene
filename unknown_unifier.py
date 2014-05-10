@@ -148,12 +148,15 @@ def main(parser):
         dir[i] = d + dataType + "_distribution.matrix"
         parse_id(dir[i])
 
-    # merge ids
-    merger = merge_ids()
+    for k in IDs.keys():
+        print k, IDs[k]
 
-    for d in dir:
-        infile_editing(merger, d)
-        print "File Upate: %s" %(d)
+    # merge ids
+#    merger = merge_ids()
+
+#    for d in dir:
+#        infile_editing(merger, d)
+#        print "File Upate: %s" %(d)
 
 if __name__ == "__main__":   
    
