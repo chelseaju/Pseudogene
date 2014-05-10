@@ -41,16 +41,17 @@ def parse_ids(infile):
 def flag_columns(infile):
 
     fh = open(infile, 'rb')
-    colnames = fh.readline()
+    colnames = fh.readline().rstrip().split("\t")
     fh.close
 
     sort_IDs =  sorted(IDs, key=lambda i:(i[1], i[2]))
-    for col in colnames.rstrip().split("\t"):
-        col_info = col.split("_")
+    for i in xrange(0,len(colnames)):
+        col_info = colnames[i].split("_")
         if(len(col_info) > 2):
-            (unknown, chromosome, start, end) = col.split("_")
+            (unknown, chromosome, start, end) = col_info
             mapped_id = filter(lambda x: (chromosome == x[1] and int(start) >= x[2] and int(start) <= x[3]), sort_IDs)
-            print mapped_id[0], col
+
+            MERGE_COLUMNS[mapped_id[0][0]].append(i+1) # make it 1-base to be parsed by R
 
 
 def main(parser):
