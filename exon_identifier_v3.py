@@ -4,6 +4,7 @@ Input:  -c chromosome name
         -d input/output directory 
         -m minimum intron size, default is 80 as suggested in "Junk in Your Genome: Intron Size and Distribution" 
         (http://sandwalk.blogspot.com/2008/02/junk-in-your-genome-intron-size-and.html)
+        -x maximum intron size, default is 4000 as suggested in the same article
 Output: a list of region the gene mapped to, in bed format
     where "name" is the gene name (instead of region name)
 Function: 1. fetch the bam file for a specific chromosome
@@ -92,7 +93,7 @@ def get_chr_name(index):
     3. if the position contains a non-zero coverage, mark the position in the array true
     output = [(name, chr, start, end)]
 """   
-def mark_position(bam, chromosome_name):
+def mark_position(bam, chromosome_name, max_intron):
 
     position_array = []
     samfile = pysam.Samfile( bam, "rb" )
@@ -103,8 +104,29 @@ def mark_position(bam, chromosome_name):
 
         prefix_match = re.match(r"(.*?):.*", read_name)
         if(prefix_match):
-            prefix = prefix_match.group(1)            
-            position_array.append((prefix, int(read.positions[0])+1, int(read.positions[-1])+1))             # bamfile is zero based
+            prefix = prefix_match.group(1)
+
+            start = int(read.positions[0]) + 1
+            end = int(read.positions[-1]) + 1
+            index = -2
+            while(end - start > max_intron): # start and end position shouldn't span longer than expected intron size
+                end = int(read.positions[index]) + 1
+                index -= 1
+
+            # traverse from end, to see which one is longer
+            if(index != -2):
+
+                second_start = int(read.positions[0]) + 1
+                second_end = int(read.positions[-1]) + 1
+                index = 1
+                while(second_end - second_start > max_intron):
+                    second_start = int(read.positions[index]) + 1
+                    index += 1
+                if(second_end - second_start > end - start):
+                    start = second_start
+                    end = second_end
+
+            position_array.append((prefix, start, end))             # bamfile is zero based
 
     return position_array
 
@@ -129,7 +151,7 @@ def collect_exon(position_array, max_gap):
 
         # continuous region
         if(name == previous_gene and (start - max_gap) <= previous_end):
-            previous_end = end
+            previous_end = max(previous_end, end)
 
         # output information
         else:
@@ -166,7 +188,8 @@ def main(parser):
     options = parser.parse_args()
     chromosome_name = options.chromosome
     dir = options.dir
-    min_intron_size = options.intronsize
+    min_intron_size = options.min_intron
+    max_intron_size = options.max_intron
     
     ## check dir
     if(dir[-1] != "/"):
@@ -174,7 +197,7 @@ def main(parser):
     
     ## start counting the reads
     sorted_input = dir + "accepted_hits_sorted.bam"
-    position_array = mark_position(sorted_input, chromosome_name)     
+    position_array = mark_position(sorted_input, chromosome_name, max_intron_size)     
 
     ## collapse the positions into exons
     exon_array = collect_exon(position_array, min_intron_size)
@@ -195,6 +218,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='exon_identifier_v3.py')
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input and output files", required = True)
-    parser.add_argument("-m", "--min_intron", dest="intronsize", type=int, default=80, help="minimum intron size [OPTIONAL]")
+    parser.add_argument("-m", "--min_intron", dest="min_intron", type=int, default=80, help="minimum intron size [OPTIONAL]")
+    parser.add_argument("-x", "--max_intron", dest="max_intron", type=int, default=4000, help="maximum intron size [OPTIONAL]")
 
     main(parser)

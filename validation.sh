@@ -1,4 +1,4 @@
-DIR="select_pseudogene_128_v5/LassoValidation_rep54"
+DIR="select_pseudogene_336_v6/LassoValidation_rep54"
 SUBDIR=("30X_101L_4A" "30X_101L_6A" "30X_101L_8A"
 	"30X_101L_R1A" "30X_101L_R2A" "30X_101L_R3A")
 

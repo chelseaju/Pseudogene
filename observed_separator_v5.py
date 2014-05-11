@@ -31,7 +31,7 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
     distribution_array = []
 
     gene_fh = open(gene_file, 'rb')
-    sorted_bam_fh = pysam.Samfile(sorted_bam)
+    sorted_bam_fh = pysam.Samfile(sorted_bam)       
 
     for gene in gene_fh:
         (gene, mapped_region, chr, start, end ) = gene.split("\t")
