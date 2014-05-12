@@ -9,7 +9,14 @@ Author: Chelsea Ju
 Date: 2014-04-05
 """
 
-import pysam, argparse
+import pysam, argparse, datetime
+
+
+"""
+    Function : helper function to output message with time
+"""
+def echo(msg):
+    print "[%s] %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str(msg))
 
 
 def read_counter(bamfile):
@@ -38,9 +45,7 @@ def export_data(counts, outfile, paired):
         if(counts[k] > threshould):
             fh.write("%s\n" %(k))
     fh.close()
-
-    print ""
-    print "Writing Multireads to File : %s" %(outfile)    
+    echo("Writing Multireads to File : %s" %(outfile))
 
 def main(parser):
     
@@ -57,7 +62,7 @@ def main(parser):
     count_hash = read_counter(bam)
       
     ## output data
-    outfile = dir + "multireads.txt"
+    outfile = dir + "correction/multireads.txt"
     export_data(count_hash, outfile, paired)
 
 
