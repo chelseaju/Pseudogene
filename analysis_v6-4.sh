@@ -48,7 +48,7 @@ done
 
 echo ""
 echo "Step 2: Data examination, check for variance of the distribution matrix"
-R --no-save --slave < data_examiniation_v2.R --args $DIR genes all all 
+R --no-save --slave < data_examination_v2.R --args $DIR genes all all 
 
 echo ""
 echo "Step 3: Prepare Data for Lasso"
