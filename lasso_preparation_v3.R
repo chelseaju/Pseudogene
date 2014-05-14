@@ -152,8 +152,6 @@ write.table(y, lasso_y, sep="\t");
 
 ## data preparation : validation
 validate_dir <- c("30X_101L_4A", "30X_101L_6A", "30X_101L_8A", "30X_101L_R1A", "30X_101L_R2A", "30X_101L_R3A");
-rm(v_y);
-rm(v_x);
 
 ## combind data
 for (suffix in validate_dir){
@@ -167,35 +165,20 @@ for (suffix in validate_dir){
 	observed <- observed[,colnames(x)];
 	observed <- observed[-nrow(observed),];
 
-	if(exists("v_y")){
-		v_y <- rbind(v_y, expected);
-	}else{
-		v_y <- expected;
-	}
+	colnames(observed) <- c("Gene_Name", "Read_Count");
 
-	if(exists("v_x")){
-		v_x <- rbind.fill(v_x, observed);
-	}else{
-		v_x <- observed;
-	}
+	## output validation data
+	validation_x <- paste(dir, "/", output_validation, "/", suffix, "_validation_x_matrix.txt", sep="");
+	validation_x_sum <- paste(dir, "/", output_validation, "/", suffix, "_validation_x_sum.txt", sep="");
+	validation_y <- paste(dir, "/", output_validation, "/", suffix, "_validation_y_vector.txt", sep="");
+
+	write.table(observed, validation_x, sep="\t");
+	write.table(colSums(observed), validation_x_sum, sep="\t");
+	write.table(expected, validation_y, sep="\t");
+
 }
 
-v_x_colname <- colnames(v_x);
-v_x[is.na(v_x)] <- 0;
 
-colnames(v_y) <- c("Gene_Name", "Read_Count");
-rownames(v_x) <- rownames(v_y);
-
-v_x_sum <- colSums(v_x);
-
-## output validation data
-validation_x <- paste(dir, "/", output_validation, "/", type, "_validation_x_matrix.txt", sep="");
-validation_x_sum <- paste(dir, "/", output_validation, "/", type, "_validation_x_sum.txt", sep="");
-validation_y <- paste(dir, "/", output_validation, "/", type, "_validation_y_vector.txt", sep="");
-
-write.table(v_x, validation_x, sep="\t");
-write.table(v_x_sum, validation_x_sum, sep="\t");
-write.table(v_y, validation_y, sep="\t");
 
 
 
