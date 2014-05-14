@@ -10,8 +10,7 @@
 
 DIR=$1
 TOPOUT="tophat_out"
-EXP=('3X_101L_4A' '3X_101L_6A' '3X_101L_8A' '3X_101L_R1A' '3X_101L_R2A' '3X_101L_R3A'
-	'5X_101L_4A' '5X_101L_6A' '5X_101L_8A' '5X_101L_R1A' '5X_101L_R2A' '5X_101L_R3A'
+EXP=('5X_101L_4A' '5X_101L_6A' '5X_101L_8A' '5X_101L_R1A' '5X_101L_R2A' '5X_101L_R3A'
 	'7X_101L_4A' '7X_101L_6A' '7X_101L_8A' '7X_101L_R1A' '7X_101L_R2A' '7X_101L_R3A'
 	'10X_101L_4A' '10X_101L_6A' '10X_101L_8A' '10X_101L_R1A' '10X_101L_R2A' '10X_101L_R3A'
 	'13X_101L_4A' '13X_101L_6A' '13X_101L_8A' '13X_101L_R1A' '13X_101L_R2A' '13X_101L_R3A'
@@ -21,7 +20,7 @@ EXP=('3X_101L_4A' '3X_101L_6A' '3X_101L_8A' '3X_101L_R1A' '3X_101L_R2A' '3X_101L
 	'27X_101L_4A' '27X_101L_6A' '27X_101L_8A' '27X_101L_R1A' '27X_101L_R2A' '27X_101L_R3A'
 	'30X_101L_4A' '30X_101L_6A' '30X_101L_8A' '30X_101L_R1A' '30X_101L_R2A' '30X_101L_R3A')
 
-#EXP=('3X_101L_4A' '3X_101L_6A' '3X_101L_8A')
+#EXP=('5X_101L_4A' '5X_101L_6A' '5X_101L_8A')
 
 
 EXP=( "${EXP[@]/#/$DIR/}" )
@@ -49,7 +48,7 @@ done
 
 echo ""
 echo "Step 2: Data examination, check for variance of the distribution matrix"
-#R --no-save --slave < data_examiniation_v2.R --args $DIR genes all all 
+R --no-save --slave < data_examiniation_v2.R --args $DIR genes all all 
 
 echo ""
 echo "Step 3: Prepare Data for Lasso"
