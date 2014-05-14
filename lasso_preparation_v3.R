@@ -62,7 +62,7 @@ dir.create(file.path(dir, output_training), showWarnings = FALSE);
 dir.create(file.path(dir, output_validation), showWarnings = FALSE);
 
 ## data preparation : training
-depth <- c("3X", "5X", "7X", "10X", "13X", "17X", "20X", "23X", "27X");
+depth <- c("5X", "7X", "10X", "13X", "15X", "17X", "20X", "23X", "27X");
 expression <- c("4A", "6A", "8A", "R1A", "R2A", "R3A");
 
 sample_size <- length(depth) * length(expression);
@@ -160,12 +160,13 @@ for (suffix in validate_dir){
 
 	observed <- read_distribution_matrix(d, type);
 	expected <- read_expected_data(d, type, rownames(observed), suffix );
-
 	observed <- rbind.fill(observed, x[1,]);
+	observed[is.na(observed)] <- 0;
 	observed <- observed[,colnames(x)];
 	observed <- observed[-nrow(observed),];
 
-	colnames(observed) <- c("Gene_Name", "Read_Count");
+	rownames(observed) <- rownames(expected);
+	colnames(expected) <- c("Gene_Name", "Expected");
 
 	## output validation data
 	validation_x <- paste(dir, "/", output_validation, "/", suffix, "_validation_x_matrix.txt", sep="");
@@ -175,6 +176,10 @@ for (suffix in validate_dir){
 	write.table(observed, validation_x, sep="\t");
 	write.table(colSums(observed), validation_x_sum, sep="\t");
 	write.table(expected, validation_y, sep="\t");
+
+	print(paste("Writting Files to ", validation_x, sep=""));
+	print(paste("Writting Files to ", validation_x_sum, sep=""));
+	print(paste("Writting Files to ", validation_y, sep=""));
 
 }
 
