@@ -106,25 +106,40 @@ def map_exon_to_gene(input_file, database):
         # 1. mapped_name matches with gene_name
         # 2. best coverage among all mapped genes
 
-        previous_gene = ("","",0,0,0,0,0)  #(gene_name, mapped_name ensembl_start, ensembl_end, exon_start, exon_end, coverage)
+        previous_gene = ("","",0,0,0,0,0)  #(0.gene_name, 1.mapped_name, 2.ensembl_start, 3.ensembl_end, 4.exon_start, 5.exon_end, 6.coverage)
         for k in sorted(gene_list.items(), key = lambda x: (x[1][0], x[1][1])):
 
-            # k = (GENENAME_MAPPEDNAME => (gene_name, ensembl_start, ensembl_end, exon_start, exon_end))
+            # k = (GENENAME_MAPPEDNAME => (0.gene_name, 1.ensembl_start, 2.ensembl_end, 3.exon_start, 4.exon_end))
             (gene_name, mapped_name) = k[0].split("_")
             coverage = (min(float(k[1][2]), float(k[1][4])) - max(float(k[1][1]), float(k[1][3]))) / max((float(k[1][2]) - float(k[1][1])), float(k[1][4]) - float(k[1][3]))
 
             # check for overlap - same gene name, overlapped positions
             if(gene_name == previous_gene[0] and k[1][1] >= previous_gene[2] and k[1][1] <= previous_gene[3]): # since the list is sorted, only check the starting position against previous stored record
-                
-                # replace previous gene only if the names do not match and coverage is better than previous gene
-                if(previous_gene[0] != previous_gene[1] and (gene_name == mapped_name or coverage > previous_gene[6])):
-                    previous_gene = (gene_name, mapped_name, min(previous_gene[2], k[1][1]), k[1][2], k[1][3], k[1][4], coverage)
+
+                ## replace previous gene only if 
+                ##  1. gene_name matches with mapped name   
+                if(gene_name == mapped_name):
+                    previous_gene = (gene_name, mapped_name, k[1][1], k[1][2], min(previous_gene[4],k[1][3]), max(previous_gene[5],k[1][4]), coverage)
+
+                ##  2. previous gene name does not match with previous mapped name and previous exon falls within this new region
+                else:
+                    if(previous_gene[0] != previous_gene[1] and (previous_gene[4] >= k[1][1] and previous_gene[5] <= k[1][2])):
+                        previous_gene = (gene_name, mapped_name, k[1][1], k[1][2], min(previous_gene[4],k[1][3]), max(previous_gene[5],k[1][4]), coverage)
+
+                    ## output the previous gene, start over
+                    else:
+                        if(previous_gene[0] != ""):
+                            final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3], previous_gene[4], previous_gene[5]))
+
+                        previous_gene = (gene_name, mapped_name, k[1][1], k[1][2], k[1][3], k[1][4], coverage)
+
 
             else:
                 #output previous gene if not ""
                 if(previous_gene[0] != ""):
 #                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[4], previous_gene[5]))
-                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3]))
+#                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3]))
+                    final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3], previous_gene[4], previous_gene[5]))
 
                 previous_gene = (gene_name, mapped_name, k[1][1], k[1][2], k[1][3], k[1][4], coverage)
 
@@ -132,7 +147,8 @@ def map_exon_to_gene(input_file, database):
         # put last item into list
         if(previous_gene[0] != ""):
 #            final_list.append((previous_gene[0], previous_gene[1], previous_gene[4], previous_gene[5]))
-            final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3]))
+#            final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3]))
+            final_list.append((previous_gene[0], previous_gene[1], previous_gene[2], previous_gene[3], previous_gene[4], previous_gene[5]))
 
     return (final_list, unknown)
 
@@ -143,7 +159,7 @@ def map_exon_to_gene(input_file, database):
 def collapse_unknown_region(unknown):
 
     final_list = []
-    unknown_collapse = (0,0,0,0)  #(chr, start, end, gene_name)
+    unknown_collapse = (0,0,0,0)  #(0.chr, 1.start, 2.end, 3.gene_name)
 
     # collapse unknown region
     unknwon = sorted(unknown, key=lambda x:(x[3], x[1]))
@@ -160,14 +176,14 @@ def collapse_unknown_region(unknown):
             ## output collapsed region
             if(unknown_collapse[0] != 0):
                 name = "Unknown_" + str(unknown_collapse[0]) + "_" + str(unknown_collapse[1]) + "_" + str(unknown_collapse[2])
-                final_list.append((unknown_collapse[3], name, int(unknown_collapse[1]), int(unknown_collapse[2])))
+                final_list.append((unknown_collapse[3], name, int(unknown_collapse[1]), int(unknown_collapse[2]), int(unknown_collapse[1]), int(unknown_collapse[2])))
 
             unknown_collapse = (u[0],u[1],u[2],u[3])
 
     # export the last one
     if(unknown_collapse[0] != 0):
         name = "Unknown_" + str(unknown_collapse[0]) + "_" + str(unknown_collapse[1]) + "_" + str(unknown_collapse[2])
-        final_list.append((unknown_collapse[3], name, int(unknown_collapse[1]), int(unknown_collapse[2])))
+        final_list.append((unknown_collapse[3], name, int(unknown_collapse[1]), int(unknown_collapse[2]), int(unknown_collapse[1]), int(unknown_collapse[2])))
 
     return final_list
 
@@ -194,8 +210,13 @@ def export_genes(gene_list, out_file, chromosome_name, append):
     else:
         out_fh = open(out_file, 'w')
 
-    for (gene_name, mapped_name, start, end) in gene_list:
-        out_fh.write("%s\t%s\t%s\t%d\t%d\n" %(gene_name, mapped_name, chromosome_name, start, end))    
+    for (gene_name, mapped_name, start, end, support_start, support_end) in gene_list:
+        coverage = (float(support_end) - float(support_start)) / (float(end) - float(start))
+
+        # filter out low coverage region
+#        print (gene_name, mapped_name, chromosome_name, start, end, support_start, support_end, coverage)
+        if(coverage > 0.01 or gene_name == mapped_name):
+            out_fh.write("%s\t%s\t%s\t%d\t%d\n" %(gene_name, mapped_name, chromosome_name, start, end))    
     out_fh.close()
        
 def main(parser):

@@ -35,7 +35,7 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
     sorted_bam_fh = pysam.Samfile(sorted_bam)       
 
     for gene in gene_fh:
-        (gene, mapped_region, chr, start, end ) = gene.split("\t")
+        (gene, mapped_region, chr, start, end ) = gene.rstrip().split("\t")
         unique_reads = {}
 
         # fetch the read from a region 
@@ -80,9 +80,8 @@ def export_array(array, outfile):
     previous_start = 0
     previous_count = 0
 
-    for (origin, mapped, start, end, count) in array:
-        if(count > 0):
-
+    for (origin, mapped, start, end, count) in sort_array:
+        if(count > 2):
             # overlap case
             if(origin == previous_origin and int(start) >= previous_start and int(start) <= previous_end):
 

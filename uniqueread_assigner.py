@@ -1,5 +1,5 @@
-""" unique_read_assigner.py
-Usage: python unique_read_assigner.py -d directory -p is_paired
+""" uniqueread_assigner.py
+Usage: python uniqueread_assigner.py -d directory -p is_paired
 Input:  -d the directory of input, output files ex: select_pseudogene_128_v1/10X_101L_1A/tophat_out
 		-p are reads paired? [True|False] 
 Output: uniquely mapped read with its best destination (in sam file)
@@ -24,31 +24,27 @@ def echo(msg):
     print "[%s] %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str(msg))
 
 """
-	Function : keep potential reads up to "count", and write it to outbamfh
-		the rest is written to leftoverfh
-		return the number of missing reads
+	Function : keep potential reads up to "count"
+		return the number of missing reads, and leftover reads
 """
-def assign_reads(potential_reads, count, paired, outbamfh, leftoverfh):
+def assign_reads(potential_reads, count, paired):
 
 	previous_name = ""
 	actual_count = 0
+	leftover = []
 
 	for pr in potential_reads:
 		(name, score, read) = pr
 
 		# for pair end reads
 		if(paired and name == previous_name):
-			outbamfh.write(read)
-
+			continue
 		elif(actual_count < count):
 			previous_name = name
-			outbamfh.write(read)
 			actual_count += 1
-
 		else:
-			leftoverfh.write(read)
-
-	return (count - actual_count)
+			leftover.append(read)
+	return (count - actual_count, leftover)
 
 """
 	Function : 
@@ -88,27 +84,64 @@ def query_reads(chromosome, start, end, bamfh):
 	return sorted_reads
 
 """
+	Function : break the given line by tab-delimited to retrieve the genomic location
+"""
+def get_locus(line):
+	data = re.split('\t|_', line.rstrip())
+
+	(name, chromosome, start, end, count) = ('', '', 0, 0, 0.0)
+
+	if(len(data) > 3 and data[0] != ''):
+		chromosome = data[1]
+		start = int(data[2])
+		end = int(data[3])
+
+		if(data[0] == "Unknown"):
+			name = data[0] + "_" + data[1] + "_" + data[2] + "_" + data[3]
+		else:
+			name = data[0]
+
+		if(len(data) > 4 and data[4] != ''):
+			count = float(data[4])
+
+	return(name, chromosome, start, end, count)
+
+"""
 	Function : iterat throught the gene list with expected count
 		query the fragments within the region
 """
-def retrieve_uniqueread(bamfh, expected_file, outbamfh, pairend, dir):
+def retrieve_uniqueread(bamfile, expected_file, post_expected_file, pairend, dir):
 
+	wh = open(post_expected_file, 'wb')
 	fh = open(expected_file, 'rb')
+	bamfh = pysam.Samfile(bamfile, 'rb')
+
+	line = fh.readline()
 	for line in fh:
-		(name, count, chromosome, start, end) = line.rstrip().split("\t")
-		count = float(count)
+		(name, chromosome, start, end, count) = get_locus(line)
+		count = int(round(count))
 
-		leftover = dir + "correction/" + name + ".bam"
-		leftoverfh = pysam.Samfile(leftover, 'wb', template=bamfh)
+		potential_reads = query_reads(chromosome, int(start), int(end), bamfh)
+		(missing, leftover_reads) = assign_reads(potential_reads, count, pairend)
 
-		if(name == "ENSG00000197223"):
-			potential_reads = query_reads(chromosome, int(start), int(end), bamfh)
-			missing = assign_reads(potential_reads, int(round(count)), pairend, outbamfh, leftoverfh)
-			print missing
+		# update count after uniqueread assigner
+		if(missing > 0):
+			wh.write("%s\t%s\t%s\t%s\t%s\n" %(name, missing, chromosome, start, end))
 
-		leftoverfh.close()
+
+	 	# output leftover unique reads
+	 	if(len(leftover_reads) > 0):
+			leftover = dir + "correction/" + name + ".bam"
+			leftoverfh = pysam.Samfile(leftover, 'wb', template=bamfh)
+			for r in leftover_reads:
+				leftoverfh.write(r)
+				echo("Writing Leftover Reads to %s" %(leftover))
+			leftoverfh.close()
+
+	bamfh.close()
 	fh.close() 
-
+	wh.close()
+	echo("Writing Missing Counts to %s" %(post_expected_file))
 
 """
 	Function : read in a list of multireads name
@@ -132,21 +165,15 @@ def main(parser):
 
     bamfile = directory + "accepted_hits_sorted.bam"
     multiread_file = directory + "correction/multireads.txt"
-    outbam = directory + "corrected_hits.bam"
+    region_file = directory + "correction/"
+
     expected_file = directory + "correction/expected_count.txt"
+    post_expected_file =  directory + "correction/post_expected_count.txt" # count after uniquread assigner
     
-    bamFH = pysam.Samfile(bamfile, 'rb')
-    outbamFH = pysam.Samfile(outbam, "wb", template=bamFH)
 
     import_multiread(multiread_file)
-    retrieve_uniqueread(bamFH, expected_file, outbamFH, pairend, directory)
-
-    bamFH.close()
-    outbamFH.close()
-
-    echo("Writing Leftover Reads to %s" %(directory+"/corection/"))
-    echo("Writing New Assignment to %s" %(outbam))
-
+    retrieve_uniqueread(bamfile, expected_file, post_expected_file, pairend, directory)
+ 
 
 if __name__ == "__main__":   
    
@@ -154,3 +181,5 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input and output files", required = True)
     parser.add_argument("-p", "--paired", dest="pair", type=bool, help="are reads paired? [True|False]", required = True)
     main(parser)
+
+

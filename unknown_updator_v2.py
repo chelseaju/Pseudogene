@@ -11,7 +11,6 @@ Date: 2014-05-09
 """
 
 import sys, re, os, random, argparse, datetime
-from numpy  import *
 
 IDs = []
 MERGE_COLUMNS = {}
@@ -53,6 +52,14 @@ def flag_columns(infile):
 
             MERGE_COLUMNS[mapped_id[0][0]].append(i+1) # make it 1-base to be parsed by R
 
+def export_merge_column(file):
+    fh = open(file, 'w')
+    for k in MERGE_COLUMNS.keys():
+        if(len(MERGE_COLUMNS[k]) > 0):
+            fh.write("%s\t%s\n" %(k, "\t".join([str(s) for s in MERGE_COLUMNS[k]])))
+    fh.close()
+
+    echo("File written to %s" %(file))
 
 def main(parser):
     
@@ -64,14 +71,16 @@ def main(parser):
     if(outdir[-1] != "/"):
         outdir += "/"
 
-
     unify_file = outdir + dataType + "_unknown_ids.txt"
+
+    merge_file = distribution_file + ".mergelist"
 
     # read in unified IDs
     parse_ids(unify_file)
 
     # read in the matrix
     flag_columns(distribution_file)
+    export_merge_column(merge_file)
 
 if __name__ == "__main__":   
    

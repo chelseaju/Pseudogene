@@ -52,7 +52,7 @@ R --no-save --slave < data_examination_v2.R --args $DIR genes all all
 
 echo ""
 echo "Step 3: Prepare Data for Lasso"
-#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 54
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 54
 
 echo ""
 echo "Step 3: Training Coefficient with Lasso"

@@ -59,7 +59,7 @@ coverage <- options[4];
 
 ## for percentage matrix and distribution matrix
 
-depth <- c("3X", "5X", "7X", "10X", "13X", "17X", "20X", "23X", "27X", "30X");
+depth <- c("5X", "7X", "10X", "13X", "15X", "17X", "20X", "23X", "27X", "30X");
 expression <- c("4A", "6A", "8A", "R1A", "R2A", "R3A");
 
 
@@ -161,7 +161,7 @@ print(paste("Number of variance > 0.05 = ", length(which(norm_x_var > 0.05)), "\
 
 
 ## plot histogram for those metabolites have high variance
-large_variance <- which(norm_x_var > 0.05)
+large_variance <- which(norm_x_var > 0.01)
 
 png(paste(dir, "/", output_subdir, "/", type, "_variance_plot.png", sep=""), width=880, height=800)
 op <- par(mfrow = c(ceiling(sqrt(length(large_variance))), ceiling(sqrt(length(large_variance)))))
@@ -178,6 +178,7 @@ for (i in 1:length(large_variance)){
 	c_name <- colnames(x)[c_index]
 
 	hist_title <- paste(r_name, "-", c_name, sep="")
+	print(hist_title)
 
 	hist(expand_x[, index], xlab = "Correlation", 
 			main = hist_title, col = "lightgreen", cex.main = 1.5)

@@ -2,7 +2,8 @@
 Usage: python multiread_marker.py -d directory -p paired
 Input: -d the directory and prefix of output files
        -p paired end file [True|False] 
-Output: A list of read that mapped to multiple places
+Output: A list of read name that mapped to multiple places
+    A list of multireads subjected to be removed
 Function: Go through the bam file, and count the read appearance
     output the read name is the count is > 2 for paired end or > 1 for single end
 Author: Chelsea Ju
@@ -19,10 +20,9 @@ def echo(msg):
     print "[%s] %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str(msg))
 
 
-def read_counter(bamfile):
+def read_counter(bamFH):
 
     counter = {}
-    bamFH = pysam.Samfile(bamfile, 'rb')
     for read in bamFH:
         name = read.qname
 
@@ -30,7 +30,6 @@ def read_counter(bamfile):
             counter[name] += 1
         else:
             counter[name] = 1
-    bamFH.close()
 
     return counter
 
@@ -47,6 +46,17 @@ def export_data(counts, outfile, paired):
     fh.close()
     echo("Writing Multireads to File : %s" %(outfile))
 
+def export_reads(counts, bamFH, removedFH, paired):
+
+    threshould = 2
+    if(not paired):
+        threshould = 1
+
+    for read in bamFH:
+        name = read.qname
+        if(counts[name] > threshould):
+            removedFH.write(read)
+
 def main(parser):
     
     options = parser.parse_args()
@@ -58,13 +68,25 @@ def main(parser):
         dir += "/"
 
     ## start counting the readd
-    bam = dir + "accepted_hits.bam"
-    count_hash = read_counter(bam)
-      
-    ## output data
+    bamfile = dir + "accepted_hits.bam"
+    removed_bam = dir + "removed_hits.bam"
+
+    bamFH = pysam.Samfile(bamfile, 'rb')
+    removedFH = pysam.Samfile(removed_bam, 'wb', template=bamFH)
+
+    count_hash = read_counter(bamFH)
+
+    ## output list of multireads
     outfile = dir + "correction/multireads.txt"
     export_data(count_hash, outfile, paired)
 
+    ## output reads to bam format, subject to be removed
+    export_reads(count_hash, bamFH, removedFH, paired)
+    echo("Written Flagged Reads to File : %s" %(removed_bam))
+
+    bamFH.close()
+    removedFH.close()
+      
 
 if __name__ == "__main__":   
    
