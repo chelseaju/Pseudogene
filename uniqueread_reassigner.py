@@ -10,7 +10,8 @@ Author: Chelsea Ju
 """
 
 import sys, re, pysam, os, random, argparse, datetime, subprocess
- 
+import blast_parser
+
 from Bio.Blast.Applications import NcbiblastnCommandline
 from StringIO import StringIO
 from Bio.Blast import NCBIXML
@@ -35,46 +36,150 @@ COUNT={}
 def echo(msg):
     print "[%s] %s" % (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), str(msg))
 
+"""
+	Function : convert the modified blast result to sam
+"""
+def blast2sam(oldread, blast, tid, start):
+
+	blast = sorted(blast, key = lambda x: x[0])
+
+	blast_index = 0
+	pair_index = -1
+
+	if(len(blast) > 1):
+		if(oldread.is_paired and oldread.is_read2):
+			blast_index = 1
+			pair_index = 0
+		else:
+			pair_index = 1
+
+	read = pysam.AlignedRead()
+	read.qname = oldread.qname
+	read.seq = oldread.seq
+	read.pos = start + blast[blast_index][1] -1
+	read.cigar = blast[blast_index][4]
+	read.rname = tid
+	read.mapq = oldread.mapq
+	read.mrnm = tid if pair_index != -1 else -1
+	read.mpos = start + blast[pair_index][1] - 1 if pair_index != -1 else -1 # position of mate
+	read.tlen = 0
+	read.qual = oldread.qual
+	
+	# flags
+	read.flag = oldread.flag
+
+	if(len(blast) > 1):
+		read.is_proper_pair = True
+		read.mate_is_unmapped = False
+		read.mate_is_reverse = blast[pair_index][5]
+	elif(read.is_paired):
+		read.is_proper_pair = False
+		read.mate_is_unmapped = True
+
+	read.is_reverse = blast[blast_index][5]
+
+	# build insert size
+	if(pair_index != -1):
+		length =  max(blast[pair_index][2], blast[blast_index][2]) - min(blast[pair_index][1], blast[blast_index][1])
+		read.tlen = length if blast[blast_index][1] < blast[pair_index][1] else length*(-1)
+
+#		print (blast[blast_index][1], blast[blast_index][2], blast[pair_index][1], blast[pair_index][2], 
+#			length if blast[blast_index][1] < blast[pair_index][1] else length*(-1))
+
+	return read
 
 
-def blast_sequences(query_file, reference_file, out_file, pairend):
-	output = NcbiblastnCommandline(query=query_file, subject=reference_file, outfmt=5, out=out_file)()
-	blast_result_record = NCBIXML.parse(open(out_file))
+"""
+	Function : select the first hits up to "count"
+"""
+def select_blast_hits(count, blast_hits, pairend):
 
-	## Query Name = record.query
-	## Query Length = record.query_len
-	## Query Match Start / End = hsp.query_start / hsp.query_end
-	## Subject Match Start / End = hsp.sbjct_start / hsp.sbjct_end
+	selection = {}
+	actual_count = 0
 
+	for h in blast_hits:
+		name_splitter = re.match(r"(.*)\/(\d)$", h[0])
+		if(name_splitter):
+			name = name_splitter.group(1)
+		else:
+			name = h[0]
 
-	for record in blast_result_record:
-		for align in record.alignments:
-			for hsp in align.hsps:
-				print record.query, hsp.query_start, hsp.query_end
+		# for pair end reads
+		if(pairend and selection.has_key(name)):
+			selection[name].append(h)
 
+		elif(actual_count < count):
+			selection[name] = [h]
+			actual_count += 1
 
+	return(count - actual_count, selection)
+
+"""
+	Function : 1. put blast_hits into resolved_bam up to query_count
+			2. remove them from region_file_prefix
+			3. flag them for removal in removed_bam 
+"""
+def resolve_blast_hits(selected_hits, region_file_prefix, chromosome, start, name):
+
+	region_bam = region_file_prefix + ".bam"
+	region_bam_reassign = region_file_prefix + "_reassign.bam"
+	region_bam_new = region_file_prefix + "_new.bam"
+	region_bam_remove = region_file_prefix + "_remove.bam"
+
+	region_bam_fh = pysam.Samfile(region_bam, 'rb')
+	region_bam_fh_reassign = pysam.Samfile(region_bam_reassign, 'wb', template = region_bam_fh)
+	region_bam_fh_new = pysam.Samfile(region_bam_new, 'wb', template = region_bam_fh)
+	region_bam_fh_remove = pysam.Samfile(region_bam_remove, 'wb', template = region_bam_fh)
+
+	for read in region_bam_fh:
+		if(selected_hits.has_key(read.qname) and len(selected_hits[read.qname]) > 0):
+			region_bam_fh_remove.write(read)
+
+			new_read = blast2sam(read, selected_hits[read.qname], region_bam_fh.gettid(chromosome), int(start))
+			region_bam_fh_reassign.write(new_read)
+# for debug
+# 			print selected_hits[read.qname], name, chromosome, start, int(start) + selected_hits[read.qname][0][1], int(start) + selected_hits[read.qname][0][2]
+		else:
+			region_bam_fh_new.write(read)
+
+	region_bam_fh.close()
+	region_bam_fh_new.close()
+	region_bam_fh_reassign.close()
+	region_bam_fh_remove.close()
+
+	# replace the region bam file by the new region bam file
+#	os.system('mv %s %s' %(region_bam_new, region_bam))
 
 
 """
 	Function : query left over reads from the given gene name, write the sequence to fasta
 """
-def query_reads(query_name, region_file):
+def query_reads(region_file_prefix):
 
-	query_fasta = region_file + query_name + ".fasta"
-	query_bam= region_file + query_name + ".bam"
+	query_fasta = region_file_prefix + ".fasta"
+	query_bam= region_file_prefix + ".bam"
 	query_fh = pysam.Samfile(query_bam, 'rb')
 	fasta_fh = open(query_fasta, 'wb')
 	reads = []
 
 	for r in query_fh:
 		reads.append(r)
-		fasta_fh.write(">%s\n%s\n" %(r.qname, r.seq))
+
+		name = r.qname
+		if(r.is_paired and r.is_read1):
+			name += "/1"
+		elif(r.is_paired and r.is_read2):
+			name += "/2"
+		else:
+			name += "/0"
+
+		fasta_fh.write(">%s\n%s\n" %(name, r.seq))
 
 	fasta_fh.close()
 	return (query_fasta, reads)
 
 
-def reassign_reads(fasta_file, matrix_file, region_file, removed_bam, resolved_bam, pairend):
+def reassign_reads(fasta_file, matrix_file, region_file, pairend):
 
 	for name in COUNT.keys():
 		(count, chr, start, end) = COUNT[name]
@@ -94,12 +199,19 @@ def reassign_reads(fasta_file, matrix_file, region_file, removed_bam, resolved_b
 		distribution_info = filter(lambda x:float(x[1]) > 0, sorted(zip(header.split("\t"), distribution.split("\t")[1:]), key=lambda x: x[1], reverse = True))
 
 		for (query_name, query_count) in distribution_info:
-			if(round(float(query_count)) > 0 and query_name != name):
-				blast_output_file = region_file + query_name + "_" + name + ".xml"
-				(query_fasta_files, read_obj) = query_reads(query_name, region_file)
-				blast_sequences(query_fasta_files, reference_fasta_file, blast_output_file, pairend)
+			if(round(float(query_count)) > 0 and query_name != name and COUNT[name][0] > 0):
+				region_file_prefix = region_file + query_name
+				blast_output_file = region_file_prefix + "_" + name + ".xml"
+				(query_fasta_files, read_obj) = query_reads(region_file_prefix)
 
+				#call blastn
+				NcbiblastnCommandline(query=query_fasta_files, subject=reference_fasta_file, outfmt=5, out=blast_output_file)()
+				blast_hits = blast_parser.parse_blast_result(blast_output_file)
+				(resolve_count, selected_hits) = select_blast_hits(count, blast_hits, pairend)
+				resolve_blast_hits(selected_hits, region_file_prefix, chr, start, name)
 
+				# upate counter
+				COUNT[name] = (resolve_count, chr, start, end)
 
 
 """
@@ -138,8 +250,6 @@ def main(parser):
 
     region_file = directory + "correction/"
     post_expected_file =  directory + "correction/post_expected_count.txt" # count after uniquread assigner
-    removed_bam = directory + "removed_hits.bam"
-    resolved_bam = directory + "resolved_hits.bam"
 
     target_genes_bed = directory + "correction/target_genes.bed"
     target_genes_fasta = directory + "correction/target_genes.fasta"
@@ -152,10 +262,16 @@ def main(parser):
     os.system('bedtools getfasta -name -fi %s -bed %s -fo %s' %(GENOME, target_genes_bed, target_genes_fasta))
     echo("Writing target genes to fasta file %s" %(target_genes_fasta))
 
-    reassign_reads(target_genes_fasta, distribution_matrix_file, region_file, removed_bam, resolved_bam, pairend)
 
-#    retrieve_uniqueread(bamfile, expected_file, post_expected_file, pairend, directory)
- 
+    current_count = 0
+    total_count =  sum([COUNT[k][0] for k in COUNT.keys()])
+
+    while(total_count != current_count):
+	    current_count = sum([COUNT[k][0] for k in COUNT.keys()])
+	    reassign_reads(target_genes_fasta, distribution_matrix_file, region_file, pairend)
+	    total_count =  sum([COUNT[k][0] for k in COUNT.keys()])
+
+	 
 
 if __name__ == "__main__":   
    
