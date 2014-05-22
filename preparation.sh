@@ -9,8 +9,8 @@ ABUNDANCE=$4
 SIMULATOR="/u/home/c/chelseaj/project/software/RNAseqSim-CJ.jar"
 GENOME="/u/home/c/chelseaj/project/database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 GENOMEINDEX="/u/home/c/chelseaj/project/database/Ensembl/Bowtie2Index/genome"
-ERROR1="/u/home/c/chelseaj/project/database/SequenceQuality/paired_101/hiseq_1.fastq"
-ERROR2="/u/home/c/chelseaj/project/database/SequenceQuality/paired_101/hiseq_2.fastq"
+ERROR1="/u/home/c/chelseaj/project/database/SequenceQuality/paired_$READLEN/hiseq_1.fastq"
+ERROR2="/u/home/c/chelseaj/project/database/SequenceQuality/paired_$READLEN/hiseq_2.fastq"
 
 #SIMULATOR="RNAseqSim-CJ.jar"
 #GENOME="/home/chelseaju/Database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"

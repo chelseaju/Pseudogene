@@ -53,6 +53,21 @@ R --no-save --slave < data_examination_v2.R --args $DIR genes all all
 echo ""
 echo "Step 3: Prepare Data for Lasso"
 R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 54
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 50
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 45
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 40
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 35
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 30
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 25
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 20
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 15
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 10
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 5
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 4
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 3
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 2
+R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 1
+
 
 echo ""
 echo "Step 3: Training Coefficient with Lasso"

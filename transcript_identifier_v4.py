@@ -1,5 +1,5 @@
 """ transcript_identifier
-Usage: python transcript_identifier_v2.py -c chromosome -d directory 
+Usage: python transcript_identifier_v4.py -c chromosome -d directory 
 Input:  -c chromosome name
         -d input/output directory 
 Output: 
@@ -13,24 +13,13 @@ Author: Chelsea Ju
 import sys, re, os, subprocess, random, argparse, datetime
 
 # LAB
-#DB = "/home/chelseaju/Database/Pseudogene/ENST_Pseudogene_74.bed"
-#DB = "/home/chelseaju/Database/Pseudogene/ParentENST_Pseudogene_74.bed"
-#ENSEMBL_GENE = "/home/chelseaju/Database/Ensembl/ENST_74.bed"
-#PARENT_GENE = "/home/chelseaju/Database/Pseudogene/Parent_ENST_74.bed"
-#PSEUDO_GENE = "/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
+#DB = "/home/chelseaju/Database/Pseudogene/Composite_ENST_74.bed"
 
 # HOFFMAN
-DB  = "/u/home/c/chelseaj/project/database/Pseudogene/ENST_Pseudogene_74.bed"
-#DB = "/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
-#ENSEMBL_GENE = "/u/home/c/chelseaj/project/database/Ensembl/ENST_74.bed"
-#PARENT_GENE = "/u/home/c/chelseaj/project/database/Pseudogene/Parent_ENSG_74.bed"
-#PSEUDO_GENE =  "/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
+DB  = "/u/home/c/chelseaj/project/database/Pseudogene/Composite_ENST_74.bed"
 
 # MAC
 #DB = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/ParentENST_Pseudogene_74.bed"
-#ENSEMBL_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/ENST_74.bed"
-#PARENT_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/Parent_ENST_74.bed"
-#PSEUDO_GENE = "/Users/Chelsea/Bioinformatics/CJDatabase/Pseudogene/Pseudogene_74.bed"
 
 
 """

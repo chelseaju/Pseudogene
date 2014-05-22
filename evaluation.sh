@@ -17,8 +17,8 @@ ASSEMBLY=$CUFFMERGE/assemblies.txt
 #GENOME="/u/home/c/chelseaj/project/database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 
 #GTF="/home/chelseaju/Database/Ensembl/Homo_sapiens.GRCh37.74.gtf"
-#GTF="$DIR/SELECT_GENES.gtf"
-GTF="$DIR/POTENTIAL_GENES.gtf"
+GTF="$DIR/SELECT_GENES.gtf"
+#GTF="$DIR/POTENTIAL_GENES.gtf"
 GENOME="/home/chelseaju/Database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 
 ## Step 0: Create directory
@@ -54,5 +54,5 @@ echo "cuffdiff -o $CUFFMERGE -b $GENOME -L $SAMPLEA,$SAMPLEB -u $CUFFMERGE/merge
 ## Step 4 - Data Preprocessing"
 echo ""
 echo "Step 4 - Preprocessing Data"
-python cufflink_evaluator_v2.py -d $CUFFMERGE -t isoform -a $DIR/$SAMPLEA/$TOPHAT/genes_expected_read_count.txt -b $DIR/$SAMPLEB/$TOPHAT/genes_expected_read_count.txt
+#python cufflink_evaluator_v2.py -d $CUFFMERGE -t isoform -a $DIR/$SAMPLEA/$TOPHAT/genes_expected_read_count.txt -b $DIR/$SAMPLEB/$TOPHAT/genes_expected_read_count.txt
 

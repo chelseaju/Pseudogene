@@ -157,14 +157,14 @@ write.table(norm_x_var, var_file, sep="\t")
 
 print(paste("Maximum variance = ", max(norm_x_var), "\n", sep=""));
 print(paste("Minimum variance = ", min(norm_x_var), "\n", sep=""));
-print(paste("Number of variance > 0.05 = ", length(which(norm_x_var > 0.05)), "\n", sep=""));
+print(paste("Number of variance > 0.01 = ", length(which(norm_x_var > 0.01)), "\n", sep=""));
 
 
 ## plot histogram for those metabolites have high variance
 large_variance <- which(norm_x_var > 0.01)
 
-png(paste(dir, "/", output_subdir, "/", type, "_variance_plot.png", sep=""), width=880, height=800)
-op <- par(mfrow = c(ceiling(sqrt(length(large_variance))), ceiling(sqrt(length(large_variance)))))
+#png(paste(dir, "/", output_subdir, "/", type, "_variance_plot.png", sep=""), width=880, height=800)
+#op <- par(mfrow = c(ceiling(sqrt(length(large_variance))), ceiling(sqrt(length(large_variance)))))
 
 for (i in 1:length(large_variance)){
 	index <- large_variance[i]
@@ -178,7 +178,8 @@ for (i in 1:length(large_variance)){
 	c_name <- colnames(x)[c_index]
 
 	hist_title <- paste(r_name, "-", c_name, sep="")
-	print(hist_title)
+	
+	print(paste(hist_title, norm_x_var[index], sep="::"))
 
 	hist(expand_x[, index], xlab = "Correlation", 
 			main = hist_title, col = "lightgreen", cex.main = 1.5)
@@ -186,6 +187,6 @@ for (i in 1:length(large_variance)){
 		 add=TRUE, col="darkblue", lwd=2) 
 
 }
-dev.off()
+#dev.off()
 
 

@@ -2,8 +2,14 @@
 Usage: python uniqueread_reassigner.py -d directory -p is_paired
 Input:  -d the directory of input, output files ex: select_pseudogene_128_v1/10X_101L_1A/tophat_out
 		-p are reads paired? [True|False] 
-Output: retrieve the unique read from close sequence similarity region, and reassign the positions
-Function: 
+Output: 1. target_genes.fasta and target_genes.bed
+		2. ref_.fasta for genes and query_.fasta for reads
+		3. __resolved_hits.bam for newly assigned reads
+		4. update remove_list.txt
+		5. update gene count to post_post_post_expected_count.txt
+		6. update reginal bam for new iteration
+
+Function: reassign the leftover unique reads to a different gene
 
 Date: 2014-05-13
 Author: Chelsea Ju
@@ -39,7 +45,7 @@ def echo(msg):
 """
 	Function : convert the modified blast result to sam
 """
-def blast2sam(oldread, blast, tid, start):
+def blast2sam(oldread, blast, tid, start, strand):
 
 	blast = sorted(blast, key = lambda x: x[0])
 
@@ -64,7 +70,15 @@ def blast2sam(oldread, blast, tid, start):
 	read.mpos = start + blast[pair_index][1] - 1 if pair_index != -1 else -1 # position of mate
 	read.tlen = 0
 	read.qual = oldread.qual
-	
+
+	# tags
+	for t in oldread.tags:
+		(t_name, t_value) = t
+		if(t_name == "XS"):
+			read.tags += [("XS", strand)]
+		else:
+			read.tags += [(t_name, t_value)]
+
 	# flags
 	read.flag = oldread.flag
 
@@ -117,38 +131,38 @@ def select_blast_hits(count, blast_hits, pairend):
 """
 	Function : 1. put blast_hits into resolved_bam up to query_count
 			2. remove them from region_file_prefix
-			3. flag them for removal in removed_bam 
+			3. flag them for removal in removefh
 """
-def resolve_blast_hits(selected_hits, region_file_prefix, chromosome, start, name):
+def resolve_blast_hits(selected_hits, region_file_prefix, chromosome, start, name, strand, removefh):
 
 	region_bam = region_file_prefix + ".bam"
-	region_bam_reassign = region_file_prefix + "_reassign.bam"
+	region_bam_reassign = region_file_prefix + "_resolved_hits.bam"
 	region_bam_new = region_file_prefix + "_new.bam"
-	region_bam_remove = region_file_prefix + "_remove.bam"
 
 	region_bam_fh = pysam.Samfile(region_bam, 'rb')
 	region_bam_fh_reassign = pysam.Samfile(region_bam_reassign, 'wb', template = region_bam_fh)
 	region_bam_fh_new = pysam.Samfile(region_bam_new, 'wb', template = region_bam_fh)
-	region_bam_fh_remove = pysam.Samfile(region_bam_remove, 'wb', template = region_bam_fh)
 
 	for read in region_bam_fh:
 		if(selected_hits.has_key(read.qname) and len(selected_hits[read.qname]) > 0):
-			region_bam_fh_remove.write(read)
+			removefh.write("%s\n" %read.qname)
 
-			new_read = blast2sam(read, selected_hits[read.qname], region_bam_fh.gettid(chromosome), int(start))
+			new_read = blast2sam(read, selected_hits[read.qname], region_bam_fh.gettid(chromosome), int(start), strand)
 			region_bam_fh_reassign.write(new_read)
 # for debug
 # 			print selected_hits[read.qname], name, chromosome, start, int(start) + selected_hits[read.qname][0][1], int(start) + selected_hits[read.qname][0][2]
+
+		# kept the read in list
 		else:
 			region_bam_fh_new.write(read)
 
 	region_bam_fh.close()
 	region_bam_fh_new.close()
 	region_bam_fh_reassign.close()
-	region_bam_fh_remove.close()
 
 	# replace the region bam file by the new region bam file
-#	os.system('mv %s %s' %(region_bam_new, region_bam))
+	os.system("mv %s %s" %(region_bam_new, region_bam))  
+	echo("Updating %s" %(region_bam))
 
 
 """
@@ -179,10 +193,10 @@ def query_reads(region_file_prefix):
 	return (query_fasta, reads)
 
 
-def reassign_reads(fasta_file, matrix_file, region_file, pairend):
+def reassign_reads(fasta_file, matrix_file, region_file, pairend, removefh):
 
 	for name in COUNT.keys():
-		(count, chr, start, end) = COUNT[name]
+		(count, chr, start, end, strand) = COUNT[name]
 		fasta = subprocess.check_output(["grep", "-A1", name, fasta_file])
 		(title, sequence, empty) = fasta.split("\n")
 
@@ -208,10 +222,10 @@ def reassign_reads(fasta_file, matrix_file, region_file, pairend):
 				NcbiblastnCommandline(query=query_fasta_files, subject=reference_fasta_file, outfmt=5, out=blast_output_file)()
 				blast_hits = blast_parser.parse_blast_result(blast_output_file)
 				(resolve_count, selected_hits) = select_blast_hits(count, blast_hits, pairend)
-				resolve_blast_hits(selected_hits, region_file_prefix, chr, start, name)
+				resolve_blast_hits(selected_hits, region_file_prefix, chr, start, name, strand, removefh)
 
 				# upate counter
-				COUNT[name] = (resolve_count, chr, start, end)
+				COUNT[name] = (resolve_count, chr, start, end, strand)
 
 
 """
@@ -232,10 +246,23 @@ def count_2_bed(bedfile):
 def import_count(file):
 	fh = open(file, 'rb')
 	for line in fh:
-		(name, count, chromosome, start, end) = line.rstrip().split("\t")
-		COUNT[name] = (int(count), chromosome, start, end)
+		(name, count, chromosome, start, end, strand) = line.rstrip().split("\t")
+		COUNT[name] = (int(count), chromosome, start, end, strand)
 	fh.close()
 
+"""
+	Function : update expected_count
+"""
+def update_count(file):
+	fh = open(file, 'w')
+	for key in COUNT.keys():
+		(count, chromosome, start, end, strand) = COUNT[key]
+
+		if(count > 0):
+			fh.write("%s\t%s\t%s\t%s\t%s\t%s\n" %(key, count, chromosome, start, end, strand))
+
+	fh.close()
+	echo("Writing Updated Read Count to %s" %(file))
 
 
 def main(parser):
@@ -249,7 +276,11 @@ def main(parser):
     	directory += "/"
 
     region_file = directory + "correction/"
-    post_expected_file =  directory + "correction/post_expected_count.txt" # count after uniquread assigner
+    expected_file =  directory + "correction/post_post_expected_count.txt" # count after uniquread assigner
+    post_expected_file =  directory + "correction/post_post_post_expected_count.txt"
+
+    remove_list = directory + "correction/removelist.txt"
+    removefh = open(remove_list, 'a')
 
     target_genes_bed = directory + "correction/target_genes.bed"
     target_genes_fasta = directory + "correction/target_genes.fasta"
@@ -257,7 +288,7 @@ def main(parser):
     distribution_matrix_file = directory + "correction/distribution_matrix.txt"
 
     ## read in data
-    import_count(post_expected_file)
+    import_count(expected_file)
     count_2_bed(target_genes_bed)
     os.system('bedtools getfasta -name -fi %s -bed %s -fo %s' %(GENOME, target_genes_bed, target_genes_fasta))
     echo("Writing target genes to fasta file %s" %(target_genes_fasta))
@@ -265,13 +296,21 @@ def main(parser):
 
     current_count = 0
     total_count =  sum([COUNT[k][0] for k in COUNT.keys()])
+    counter = 1
 
-    while(total_count != current_count):
-	    current_count = sum([COUNT[k][0] for k in COUNT.keys()])
-	    reassign_reads(target_genes_fasta, distribution_matrix_file, region_file, pairend)
-	    total_count =  sum([COUNT[k][0] for k in COUNT.keys()])
+    while(total_count > 0 and total_count != current_count):
+    	echo("Updating Realignment Count, Cycle %d" %(counter))
+    	current_count = sum([COUNT[k][0] for k in COUNT.keys()])
+    	reassign_reads(target_genes_fasta, distribution_matrix_file, region_file, pairend, removefh)
+    	total_count = sum([COUNT[k][0] for k in COUNT.keys()])
+    	counter += 1
 
-	 
+  	removefh.close()
+
+  	update_count(post_expected_file)
+
+	echo("Intermediate files %s, %s, %s are written to %s" %("ref_.fa", "query.fa", "ref_query.xml", region_file))
+	echo("Writing Delete Reads to %s" %(remove_list))
 
 if __name__ == "__main__":   
    

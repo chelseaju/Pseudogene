@@ -53,7 +53,7 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
                         ## valid count is considred as
                         # 1. the same read name is only counted once for this region
                         # 2. the read starting point has to fall within this region
-                        if(not unique_reads.has_key(name) and read.positions[0] >= int(start) and read.positions[0] <= int(end)):
+                        if(not unique_reads.has_key(name) and read.positions[0] >= (int(start) - 80) and read.positions[0] <= (int(end) + 80)):
                             unique_reads[name] = 0
             
             distribution_array.append((gene, mapped_region, start, end, len(unique_reads)))
@@ -139,7 +139,7 @@ def main(parser):
 
 if __name__ == "__main__":   
    
-    parser = argparse.ArgumentParser(prog='observed_separator_v2.py')
+    parser = argparse.ArgumentParser(prog='observed_separator_v6.py')
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
     parser.add_argument("-t", "--dataType", dest="data_type", type=str, help="genes or transcripts", required = True)

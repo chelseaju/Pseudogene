@@ -62,7 +62,6 @@ def query_reads(chromosome, start, end, bamfh):
 
 		# find unique read
 		if(not ASSIGNMENT.has_key(name)):
-
 			# check if the read is completely within the range +/- 80bp
 			if(read_start >= (start - 80) and read_start <= (end + 80) and read_end >= (start - 80) and read_end <= (end + 80)):
 
@@ -89,8 +88,7 @@ def query_reads(chromosome, start, end, bamfh):
 def get_locus(line):
 	data = re.split('\t|_', line.rstrip())
 
-	(name, chromosome, start, end, count) = ('', '', 0, 0, 0.0)
-
+	(name, chromosome, start, end, strand, count) = ('', '', 0, 0, '', 0.0)	
 	if(len(data) > 3 and data[0] != ''):
 		chromosome = data[1]
 		start = int(data[2])
@@ -100,11 +98,12 @@ def get_locus(line):
 			name = data[0] + "_" + data[1] + "_" + data[2] + "_" + data[3]
 		else:
 			name = data[0]
+			strand = data[4]
 
-		if(len(data) > 4 and data[4] != ''):
-			count = float(data[4])
+		if(len(data) > 5 and data[5] != ''):
+			count = float(data[5])
 
-	return(name, chromosome, start, end, count)
+	return(name, chromosome, start, end, strand, count)
 
 """
 	Function : iterat throught the gene list with expected count
@@ -118,7 +117,7 @@ def retrieve_uniqueread(bamfile, expected_file, post_expected_file, pairend, dir
 
 	line = fh.readline()
 	for line in fh:
-		(name, chromosome, start, end, count) = get_locus(line)
+		(name, chromosome, start, end, strand, count) = get_locus(line)
 		count = int(round(count))
 
 		potential_reads = query_reads(chromosome, int(start), int(end), bamfh)
@@ -126,7 +125,7 @@ def retrieve_uniqueread(bamfile, expected_file, post_expected_file, pairend, dir
 
 		# update count after uniqueread assigner
 		if(missing > 0):
-			wh.write("%s\t%s\t%s\t%s\t%s\n" %(name, missing, chromosome, start, end))
+			wh.write("%s\t%s\t%s\t%s\t%s\t%s\n" %(name, missing, chromosome, start, end, strand))
 
 
 	 	# output leftover unique reads
@@ -135,7 +134,6 @@ def retrieve_uniqueread(bamfile, expected_file, post_expected_file, pairend, dir
 			leftoverfh = pysam.Samfile(leftover, 'wb', template=bamfh)
 			for r in leftover_reads:
 				leftoverfh.write(r)
-				echo("Writing Leftover Reads to %s" %(leftover))
 			leftoverfh.close()
 
 	bamfh.close()
@@ -173,7 +171,8 @@ def main(parser):
 
     import_multiread(multiread_file)
     retrieve_uniqueread(bamfile, expected_file, post_expected_file, pairend, directory)
- 
+    echo("Writing Leftover Reads to %s" %(region_file))
+
 
 if __name__ == "__main__":   
    

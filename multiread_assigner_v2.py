@@ -2,7 +2,10 @@
 Usage: python multiread_assigner.py -d directory -p is_paired
 Input:  -d the directory of input, output files ex: select_pseudogene_128_v1/10X_101L_1A/tophat_out
 		-p are reads paired? [True|False] 
-Output: 
+Output:  1. update multiread list with the new gene name it assigned to
+		2. output reolved_hits.bam for a list of selected Multireads
+		3. output remove_list to flag a list of reads to be removed
+		4. output post_post_expected_count.txt for the remaining counts
 Function: 1. Rank the list based on the number of missing reads (large to small)
 		  2. Iterate through the list, and assign the multireads fall in this region to itself
 		  3. Update the multiread list if the read has already been assigned
@@ -29,8 +32,9 @@ def echo(msg):
 """
 	Function : keep potential reads up to "count", update ASSIGNMENT
 		output the assigned multireads to resolvedbam
+		update the remove list (add the newly assigned multireads for removal)
 """
-def assign_reads(geneName, potential_reads, count, paired, resolvedbam):
+def assign_reads(geneName, potential_reads, count, paired, resolvedbam, removefh):
 
 	previous_name = ""
 	actual_count = 0	
@@ -46,6 +50,7 @@ def assign_reads(geneName, potential_reads, count, paired, resolvedbam):
 			previous_name = name
 			actual_count += 1
 			resolvedbam.write(read)
+			removefh.write("%s\n" %(name))
 			ASSIGNMENT[name] = geneName
 
 	return (count - actual_count)
@@ -97,28 +102,28 @@ def query_reads(chromosome, start, end, bamfh):
 		to avoid assigning all multireads to one region, "proportion" can be adjusted
 		1 is optimal so far
 """
-def retrieve_multiread(bamfh, resolvedfh, pairend, proportion):
+def retrieve_multiread(bamfh, resolvedfh, pairend, proportion, removefh):
 
 
 	for data in sorted(COUNT.items(), key=lambda x: x[1][0]):
 		name = data[0]
-		(expected, chromosome, start, end) = data[1]
+		(expected, chromosome, start, end, strand) = data[1]
 
 		if(expected > 0):
 			potential_reads = query_reads(chromosome, int(start), int(end), bamfh)
 
-			missing = assign_reads(name, potential_reads, int(round(expected*proportion)), pairend, resolvedfh)
+			missing = assign_reads(name, potential_reads, int(round(expected*proportion)), pairend, resolvedfh, removefh)
 
 			remains = expected - int(round(expected*proportion)) + missing
-			COUNT[name] = (remains, chromosome, start, end) # update count
+			COUNT[name] = (remains, chromosome, start, end, strand) # update count
 """
 	Function : read in the expected_count.txt
 """
 def import_count(file):
 	fh = open(file, 'rb')
 	for line in fh:
-		(name, count, chromosome, start, end) = line.rstrip().split("\t")
-		COUNT[name] = (int(count), chromosome, start, end)
+		(name, count, chromosome, start, end, strand) = line.rstrip().split("\t")
+		COUNT[name] = (int(count), chromosome, start, end, strand)
 	fh.close()
 
 """
@@ -137,12 +142,13 @@ def import_multiread(file):
 def update_count(file):
 	fh = open(file, 'w')
 	for key in COUNT.keys():
-		(count, chromosome, start, end) = COUNT[key]
+		(count, chromosome, start, end, strand) = COUNT[key]
 
 		if(count > 0):
-			fh.write("%s\t%s\t%s\t%s\t%s\n" %(key, count, chromosome, start, end))
+			fh.write("%s\t%s\t%s\t%s\t%s\t%s\n" %(key, count, chromosome, start, end, strand))
 
 	fh.close()
+	echo("Writing Updated Read Count to %s" %(file))
 
 """
 	Function : update multireads with the assigned region
@@ -164,13 +170,16 @@ def main(parser):
     	directory += "/"
 
     bamfile = directory + "accepted_hits_sorted.bam"
-    resolvedbam = directory + "resolved_hits.bam"
+    resolvedbam = directory + "correction/resolved_hits.bam"
     multiread_file = directory + "correction/multireads.txt"
+    remove_list = directory + "correction/removelist.txt"
+
     expected_file =  directory + "correction/post_expected_count.txt" # count after uniquread assigner
     post_expected_file =  directory + "correction/post_post_expected_count.txt" # count after uniquread assigner
     
     bamfh = pysam.Samfile(bamfile, 'rb')
     resolvedfh = pysam.Samfile(resolvedbam, 'wb', template = bamfh)
+    removefh = open(remove_list, 'w')
 
     # load data into memory
     import_multiread(multiread_file)
@@ -181,10 +190,10 @@ def main(parser):
     total_count = sum([c[1][0] for c in COUNT.items()])
 
     counter = 1
-    while(total_count != pre_count):    	
+    while(total_count > 0 and total_count != pre_count):    	
     	echo("Updating Multireads Count, Cycle %d" %(counter))
     	pre_count = total_count
-    	retrieve_multiread(bamfh, resolvedfh, pairend, 1)
+    	retrieve_multiread(bamfh, resolvedfh, pairend, 1, removefh)
     	total_count = sum([c[1][0] for c in COUNT.items()])
     	counter += 1
 
@@ -194,14 +203,16 @@ def main(parser):
 
     bamfh.close()
     resolvedfh.close()
+    removefh.close()
     echo("Writing Selected Multireads to %s" %(resolvedbam))
     echo("Writing Update Multireads at %s" %(multiread_file))
+    echo("Writing Delete Multireads to %s" %(remove_list))
 
 
 
 if __name__ == "__main__":   
    
-    parser = argparse.ArgumentParser(prog='multiread_resolver.py')
+    parser = argparse.ArgumentParser(prog='multiread_resolver_v2.py')
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input and output files", required = True)
     parser.add_argument("-p", "--paired", dest="pair", type=bool, help="are reads paired? [True|False]", required = True)
     main(parser)

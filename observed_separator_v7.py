@@ -1,5 +1,5 @@
 """
-Usage: python observed_separator_v5.py -c chromosome_name -d directory -t dataType
+Usage: python observed_separator_v7.py -c chromosome_name -d directory -t dataType
 Input: -d the directory and prefix of output files, -c chromosome name -t dataType[genes or transcripts]
 Output: a file with three columns {original_gene \t mapped_region \t read_count_of_mapped_region} 
 Function: Similar to observed_counter.py, it gathers all the reads for newly identified gene regions,
@@ -7,7 +7,8 @@ Function: Similar to observed_counter.py, it gathers all the reads for newly ide
     Each line in the output file corresponds to one origin and one mapped region, and the same origin may have multiple mapped regions. 
 
 Date: 2014-01-08
-Last Update: 2014-05-01 - change on line 55
+Update: 2014-05-01 - change on line 55
+Update: 2014-05-01 - change on line 59, add function to remove overlapped region
 Author: Chelsea Ju
 """
 
@@ -34,7 +35,7 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
     sorted_bam_fh = pysam.Samfile(sorted_bam)       
 
     for gene in gene_fh:
-        (gene, mapped_region, chr, start, end ) = gene.split("\t")
+        (gene, mapped_region, chr, start, end ) = gene.rstrip().split("\t")
         unique_reads = {}
 
         # fetch the read from a region 
@@ -55,7 +56,7 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
                         if(not unique_reads.has_key(name) and read.positions[0] >= int(start) and read.positions[0] <= int(end)):
                             unique_reads[name] = 0
             
-            distribution_array.append((gene, mapped_region, len(unique_reads)))
+            distribution_array.append((gene, mapped_region, start, end, len(unique_reads)))
          
     gene_fh.close()
     sorted_bam_fh.close()
@@ -63,15 +64,49 @@ def observed_read_separator(sorted_bam, gene_file, chromosome_name):
     return distribution_array
 
 """
-    Write the data to file
+    Write the data to file:
+        First, remove the overlapped genes
 """
 def export_array(array, outfile):
+
+    # sort the array by gene, and start positions
+    sort_array = sorted(array, key=lambda x: (x[0],x[2]))
+
+    # write to output
     out_fh = open(outfile, "w")
 
-    for (origin, mapped, count) in array:
+    previous_origin = ""
+    previous_mapped = ""
+    previous_start = 0
+    previous_count = 0
+
+    for (origin, mapped, start, end, count) in sort_array:
         if(count > 2):
-            out_fh.write("%s\t%s\t%d\n" %(origin, mapped, count))
-    
+            # overlap case
+            if(origin == previous_origin and int(start) >= previous_start and int(start) <= previous_end):
+
+                # replace previous
+                if(origin == mapped):
+                    previous_origin = origin
+                    previous_mapped = mapped
+                    previous_start = int(start)
+                    previous_end = int(end)
+                    previous_count = int(count)
+
+            else:
+                if(previous_origin != ""):
+                    out_fh.write("%s\t%s\t%d\n" %(previous_origin, previous_mapped, previous_count))
+
+                previous_origin = origin
+                previous_mapped = mapped
+                previous_start = int(start)
+                previous_end = int(end)
+                previous_count = int(count)
+
+    # output the last case
+    if(previous_origin != ""):
+        out_fh.write("%s\t%s\t%d\n" %(previous_origin, previous_mapped, previous_count))
+
     out_fh.close()
 
     echo("Writing Read Distribution to File : %s" %(outfile))
@@ -104,7 +139,7 @@ def main(parser):
 
 if __name__ == "__main__":   
    
-    parser = argparse.ArgumentParser(prog='observed_separator_v2.py')
+    parser = argparse.ArgumentParser(prog='observed_separator_v7.py')
     parser.add_argument("-c", "--chromosome", dest="chromosome", type=str, help="chromosome name, ex chr1", required = True)
     parser.add_argument("-d", "--directory", dest="dir", type=str, help="directory of input files", required = True)
     parser.add_argument("-t", "--dataType", dest="data_type", type=str, help="genes or transcripts", required = True)
