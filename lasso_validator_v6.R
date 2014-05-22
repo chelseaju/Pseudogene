@@ -68,7 +68,7 @@ write.table(validation, v1_outfile, sep="\t");
 
 print(paste("Written File to ", v1_outfile, sep=""));
 
-write.table(estimated_Y, v1_Y_outfile, sep="");
+write.table(estimated_Y, v1_Y_outfile, sep="\t", quote=FALSE);
 print(paste("Written File to ", v1_Y_outfile, sep=""));
 
 
@@ -93,7 +93,7 @@ write.table(validation, v2_outfile, sep="\t");
 
 print(paste("Written File to ", v2_outfile, sep=""));
 
-write.table(estimated_Y, v2_Y_outfile, sep="");
+write.table(estimated_Y, v2_Y_outfile, sep="\t", quote=FALSE);
 print(paste("Written File to ", v1_Y_outfile, sep=""));
 
 

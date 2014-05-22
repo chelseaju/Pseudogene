@@ -29,9 +29,9 @@ from Bio import SeqIO
 ## GENOME FILE
 
 # LAB
-GENOME="/home/chelseaju/Database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
+#GENOME="/home/chelseaju/Database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 # HOFFMAN
-#GENOME = "/u/home/c/chelseaj/project/database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
+GENOME = "/u/home/c/chelseaj/project/database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 
 BLAST_THRESHOLD = 0.000001
 COUNT={}
