@@ -29,9 +29,9 @@ from Bio import SeqIO
 ## GENOME FILE
 
 # LAB
-#GENOME="/home/chelseaju/Database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
+GENOME="/home/chelseaju/Database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 # HOFFMAN
-GENOME = "/u/home/c/chelseaj/project/database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
+#GENOME = "/u/home/c/chelseaj/project/database/Ensembl/Genome/Homo_sapiens_GRCh37_74_genome.fa"
 
 BLAST_THRESHOLD = 0.000001
 COUNT={}
@@ -170,27 +170,31 @@ def resolve_blast_hits(selected_hits, region_file_prefix, chromosome, start, nam
 """
 def query_reads(region_file_prefix):
 
-	query_fasta = region_file_prefix + ".fasta"
 	query_bam= region_file_prefix + ".bam"
-	query_fh = pysam.Samfile(query_bam, 'rb')
+	return_reads = []
+
+	query_fasta = region_file_prefix + ".fasta"
 	fasta_fh = open(query_fasta, 'wb')
-	reads = []
 
-	for r in query_fh:
-		reads.append(r)
+	if(os.path.exists(query_bam)):
+		query_fh = pysam.Samfile(query_bam, 'rb')
 
-		name = r.qname
-		if(r.is_paired and r.is_read1):
-			name += "/1"
-		elif(r.is_paired and r.is_read2):
-			name += "/2"
-		else:
-			name += "/0"
+		for r in query_fh:
+			return_reads.append(r)
 
-		fasta_fh.write(">%s\n%s\n" %(name, r.seq))
+			name = r.qname
+			if(r.is_paired and r.is_read1):
+				name += "/1"
+			elif(r.is_paired and r.is_read2):
+				name += "/2"
+			else:
+				name += "/0"
 
-	fasta_fh.close()
-	return (query_fasta, reads)
+			fasta_fh.write(">%s\n%s\n" %(name, r.seq))
+		fasta_fh.close()
+		query_fh.close()
+
+	return (query_fasta, return_reads)
 
 
 def reassign_reads(fasta_file, matrix_file, region_file, pairend, removefh):
@@ -213,16 +217,20 @@ def reassign_reads(fasta_file, matrix_file, region_file, pairend, removefh):
 		distribution_info = filter(lambda x:float(x[1]) > 0, sorted(zip(header.split("\t"), distribution.split("\t")[1:]), key=lambda x: x[1], reverse = True))
 
 		for (query_name, query_count) in distribution_info:
+
 			if(round(float(query_count)) > 0 and query_name != name and COUNT[name][0] > 0):
 				region_file_prefix = region_file + query_name
 				blast_output_file = region_file_prefix + "_" + name + ".xml"
+
 				(query_fasta_files, read_obj) = query_reads(region_file_prefix)
 
-				#call blastn
-				NcbiblastnCommandline(query=query_fasta_files, subject=reference_fasta_file, outfmt=5, out=blast_output_file)()
-				blast_hits = blast_parser.parse_blast_result(blast_output_file)
-				(resolve_count, selected_hits) = select_blast_hits(count, blast_hits, pairend)
-				resolve_blast_hits(selected_hits, region_file_prefix, chr, start, name, strand, removefh)
+				resolve_count = 0
+				if(len(read_obj) > 0):
+					#call blastn
+					NcbiblastnCommandline(query=query_fasta_files, subject=reference_fasta_file, outfmt=5, out=blast_output_file)()
+					blast_hits = blast_parser.parse_blast_result(blast_output_file)
+					(resolve_count, selected_hits) = select_blast_hits(count, blast_hits, pairend)
+					resolve_blast_hits(selected_hits, region_file_prefix, chr, start, name, strand, removefh)
 
 				# upate counter
 				COUNT[name] = (resolve_count, chr, start, end, strand)

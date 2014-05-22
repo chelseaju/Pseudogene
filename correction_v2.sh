@@ -18,25 +18,25 @@ CUFFLINKS="cufflinks_after"
 #ENST2ENSG="/Users/Chelsea/Bioinformatics/CJDatabase/Ensembl/script/ENST2ENSG.py"
 
 ## HOFFMAN
-PSEUDOGENE="/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
-PARENT="/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
-BED="/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
-ENST_ENSG_ENSP="/u/home/c/chelseaj/project/database/Ensembl/ENST_ENSG_ENSP_74.txt"
-ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
+#PSEUDOGENE="/u/home/c/chelseaj/project/database/Pseudogene/Pseudogene_74.bed"
+#PARENT="/u/home/c/chelseaj/project/database/Ensembl/ENSG_74.bed"
+#BED="/u/home/c/chelseaj/project/database/Pseudogene/ParentENST_Pseudogene_74.bed"
+#ENST_ENSG_ENSP="/u/home/c/chelseaj/project/database/Ensembl/ENST_ENSG_ENSP_74.txt"
+#ENST2ENSG="/u/home/c/chelseaj/project/database/Ensembl/script/ENST2ENSG.py"
 
 ## LAB
-#PARENT="/home/chelseaju/Database/Ensembl/ENSG_74.bed"
-#PSEUDOGENE="/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
-#BED="/home/chelseaju/Database/Pseudogene/ParentENSG_Pseudogene_74.bed"
-#ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
-#ENST2ENSG="/home/chelseaju/Database/Ensembl/script/ENST2ENSG.py"
+PARENT="/home/chelseaju/Database/Ensembl/ENSG_74.bed"
+PSEUDOGENE="/home/chelseaju/Database/Pseudogene/Pseudogene_74.bed"
+BED="/home/chelseaju/Database/Pseudogene/ParentENSG_Pseudogene_74.bed"
+ENST_ENSG_ENSP="/home/chelseaju/Database/Ensembl/ENST_ENSG_ENSP_74.txt"
+ENST2ENSG="/home/chelseaju/Database/Ensembl/script/ENST2ENSG.py"
 
 echo "Read Correction Version 1:"
 
 echo ""
 echo "Step 0 - Loading Modules"
-module load python/2.7
-module load bedtools
+#module load python/2.7
+#module load bedtools
 
 
 echo ""

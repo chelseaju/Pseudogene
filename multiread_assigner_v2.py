@@ -37,17 +37,18 @@ def echo(msg):
 def assign_reads(geneName, potential_reads, count, paired, resolvedbam, removefh):
 
 	previous_name = ""
+	previous_start = 0
 	actual_count = 0	
 
 	for pr in potential_reads:
 		(name, score, read) = pr
 
 		# for pair end reads
-		if(paired and name == previous_name):
+		if(paired and name == previous_name and read.pnext == previous_start):
 			resolvedbam.write(read)
-			ASSIGNMENT[name] = geneName
-		elif(actual_count < count):
+		elif(actual_count < count and ASSIGNMENT[name] == ""):
 			previous_name = name
+			previous_start = read.positions[0]
 			actual_count += 1
 			resolvedbam.write(read)
 			removefh.write("%s\n" %(name))
@@ -90,7 +91,8 @@ def query_reads(chromosome, start, end, bamfh):
 
 				multi_reads.append((name, score, read))
 
-	sorted_reads = sorted(multi_reads, key=lambda x:(x[1], x[0]))
+	sorted_reads = sorted(multi_reads, key=lambda x:(x[1], x[0]), reverse = True)
+
 
 	return sorted_reads
 

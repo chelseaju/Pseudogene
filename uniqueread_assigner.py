@@ -78,7 +78,7 @@ def query_reads(chromosome, start, end, bamfh):
 
 				unique_reads.append((name, score, read))
 
-	sorted_reads = sorted(unique_reads, key=lambda x:(x[1], x[0]))
+	sorted_reads = sorted(unique_reads, key=lambda x:(x[1], x[0]), reverse = True)
 
 	return sorted_reads
 
