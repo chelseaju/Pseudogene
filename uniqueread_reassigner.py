@@ -72,12 +72,17 @@ def blast2sam(oldread, blast, tid, start, strand):
 	read.qual = oldread.qual
 
 	# tags
+	xs_tag_discovered = False
 	for t in oldread.tags:
 		(t_name, t_value) = t
 		if(t_name == "XS"):
+			xs_tag_discovered = True
 			read.tags += [("XS", strand)]
 		else:
 			read.tags += [(t_name, t_value)]
+
+	if(not xs_tag_discovered):
+		read.tags += [("XS", strand)]
 
 	# flags
 	read.flag = oldread.flag
@@ -89,6 +94,7 @@ def blast2sam(oldread, blast, tid, start, strand):
 	elif(read.is_paired):
 		read.is_proper_pair = False
 		read.mate_is_unmapped = True
+		read.mate_is_reverse = False
 
 	read.is_reverse = blast[blast_index][5]
 

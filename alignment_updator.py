@@ -34,12 +34,12 @@ def correct_reads(old_bam, new_bam, delete_list, resolved_files):
 	for read in old_bam_fh:
 		if(not delete_list.has_key(read.qname)):
 			new_bam_fh.write(read)
-
 	old_bam_fh.close()
 
 	## add resolved reads
 	echo("Adding Resolved Reads")
 	for f in resolved_files:
+		print f
 		fh = pysam.Samfile(f, 'rb')
 		for new_read in fh:
 			new_bam_fh.write(new_read)
