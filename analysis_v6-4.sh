@@ -34,39 +34,39 @@ python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}
 echo ""
 echo "Step 2: Update the Unknonws"
 
-for subdir in "${EXP[@]}"
-do
-	echo ""
-	echo "Sub-directory ${subdir} ===================="
-	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
-	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
-	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
-	rm $subdir/genes_distribution.backup
-done
+#for subdir in "${EXP[@]}"
+#do
+#	echo ""
+#	echo "Sub-directory ${subdir} ===================="
+#	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
+#	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
+#	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
+#	rm $subdir/genes_distribution.backup
+#done
 
 
 
 echo ""
 echo "Step 2: Data examination, check for variance of the distribution matrix"
-R --no-save --slave < data_examination_v2.R --args $DIR genes all all 
+#R --no-save --slave < data_examination_v2.R --args $DIR genes all all 
 
 echo ""
 echo "Step 3: Prepare Data for Lasso"
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 54
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 50
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 45
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 40
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 35
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 30
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 25
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 20
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 15
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 10
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 5
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 4
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 3
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 2
-R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 1
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 54
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 50
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 45
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 40
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 35
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 30
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 25
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 20
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 15
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 10
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 5
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 4
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 3
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 2
+#R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 1
 
 
 echo ""

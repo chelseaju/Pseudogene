@@ -31,8 +31,8 @@ def parse_id(file):
     line = fh.readline()
     line = line.rstrip()
     for name in line.split("\t"):
-        unknown_match = re.match("Unknown_", name)
-        if(unknown_match and not IDs.has_key(name)):
+        name = name.replace("\"","")
+        if(name[0:7]=="Unknown" and not IDs.has_key(name)):
             (unknown, chr, start, end) = name.split("_")
             IDs[name] = (chr, int(start), int(end))
     fh.close()
@@ -48,7 +48,7 @@ def merge_ids():
     current_start = 0
     current_end = 0
 
-    for e in sorted(IDs.values(), key=lambda x: (x[0], x[1])):        
+    for e in sorted(IDs.values(), key=lambda x: (x[0], x[1])):    
         (chr, start, end) = e
         ## search overlap
         if(current_chr == chr and start >= current_start and start <= current_end):
