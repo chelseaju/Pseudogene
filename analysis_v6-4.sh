@@ -10,15 +10,25 @@
 
 DIR=$1
 TOPOUT="tophat_out"
-EXP=('5X_101L_4A' '5X_101L_6A' '5X_101L_8A' '5X_101L_R1A' '5X_101L_R2A' '5X_101L_R3A'
-	'7X_101L_4A' '7X_101L_6A' '7X_101L_8A' '7X_101L_R1A' '7X_101L_R2A' '7X_101L_R3A'
-	'10X_101L_4A' '10X_101L_6A' '10X_101L_8A' '10X_101L_R1A' '10X_101L_R2A' '10X_101L_R3A'
-	'13X_101L_4A' '13X_101L_6A' '13X_101L_8A' '13X_101L_R1A' '13X_101L_R2A' '13X_101L_R3A'
-	'17X_101L_4A' '17X_101L_6A' '17X_101L_8A' '17X_101L_R1A' '17X_101L_R2A' '17X_101L_R3A'
-	'20X_101L_4A' '20X_101L_6A' '20X_101L_8A' '20X_101L_R1A' '20X_101L_R2A' '20X_101L_R3A'
-	'23X_101L_4A' '23X_101L_6A' '23X_101L_8A' '23X_101L_R1A' '23X_101L_R2A' '23X_101L_R3A'
-	'27X_101L_4A' '27X_101L_6A' '27X_101L_8A' '27X_101L_R1A' '27X_101L_R2A' '27X_101L_R3A'
-	'30X_101L_4A' '30X_101L_6A' '30X_101L_8A' '30X_101L_R1A' '30X_101L_R2A' '30X_101L_R3A')
+#EXP=('5X_101L_4A' '5X_101L_6A' '5X_101L_8A' '5X_101L_R1A' '5X_101L_R2A' '5X_101L_R3A'
+#	'7X_101L_4A' '7X_101L_6A' '7X_101L_8A' '7X_101L_R1A' '7X_101L_R2A' '7X_101L_R3A'
+#	'10X_101L_4A' '10X_101L_6A' '10X_101L_8A' '10X_101L_R1A' '10X_101L_R2A' '10X_101L_R3A'
+#	'13X_101L_4A' '13X_101L_6A' '13X_101L_8A' '13X_101L_R1A' '13X_101L_R2A' '13X_101L_R3A'
+#	'17X_101L_4A' '17X_101L_6A' '17X_101L_8A' '17X_101L_R1A' '17X_101L_R2A' '17X_101L_R3A'
+#	'20X_101L_4A' '20X_101L_6A' '20X_101L_8A' '20X_101L_R1A' '20X_101L_R2A' '20X_101L_R3A'
+#	'23X_101L_4A' '23X_101L_6A' '23X_101L_8A' '23X_101L_R1A' '23X_101L_R2A' '23X_101L_R3A'
+#	'27X_101L_4A' '27X_101L_6A' '27X_101L_8A' '27X_101L_R1A' '27X_101L_R2A' '27X_101L_R3A'
+#	'30X_101L_4A' '30X_101L_6A' '30X_101L_8A' '30X_101L_R1A' '30X_101L_R2A' '30X_101L_R3A')
+
+EXP=('5X_101L_4A' '5X_101L_6A' '5X_101L_8A' '5X_101L_R1A' 
+        '7X_101L_4A' '7X_101L_6A' '7X_101L_8A' '7X_101L_R1A'
+        '10X_101L_4A' '10X_101L_6A' '10X_101L_8A' '10X_101L_R1A'
+        '13X_101L_4A' '13X_101L_6A' '13X_101L_8A' '13X_101L_R1A'
+        '17X_101L_4A' '17X_101L_6A' '17X_101L_8A' '17X_101L_R1A'
+        '20X_101L_4A' '20X_101L_6A' '20X_101L_8A' '20X_101L_R1A'
+        '23X_101L_4A' '23X_101L_6A' '23X_101L_8A' '23X_101L_R1A'
+        '27X_101L_4A' '27X_101L_6A' '27X_101L_8A' '27X_101L_R1A'
+        '30X_101L_4A' '30X_101L_6A' '30X_101L_8A' '30X_101L_R1A')
 
 #EXP=('5X_101L_4A' '5X_101L_6A' '5X_101L_8A')
 
@@ -29,29 +39,29 @@ EXP=( "${EXP[@]/%//$TOPOUT}" )
 echo ""
 echo "Step 1: Unify the Unknowns"
 echo "python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}"
-#python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}
+python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}
 
 echo ""
 echo "Step 2: Update the Unknonws"
 
-#for subdir in "${EXP[@]}"
-#do
-#	echo ""
-#	echo "Sub-directory ${subdir} ===================="
-#	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
-#	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
-#	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
+for subdir in "${EXP[@]}"
+do
+	echo ""
+	echo "Sub-directory ${subdir} ===================="
+	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
+	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
+	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
 #	rm $subdir/genes_distribution.backup
-#done
+done
 
-echo "COMPLETE STEP 2" > $DIR"/flag_file.txt"
+
 
 echo ""
-echo "Step 3: Data examination, check for variance of the distribution matrix"
+echo "Step 2: Data examination, check for variance of the distribution matrix"
 #R --no-save --slave < data_examination_v2.R --args $DIR genes all all 
 
 echo ""
-echo "Step 4: Prepare Data for Lasso"
+echo "Step 3: Prepare Data for Lasso"
 #R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 54
 #R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 50
 #R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 45
@@ -70,7 +80,7 @@ echo "Step 4: Prepare Data for Lasso"
 
 
 echo ""
-echo "Step 5: Training Coefficient with Lasso"
+echo "Step 3: Training Coefficient with Lasso"
 #R --no-save --slave < lasso_trainer.R --args $DIR genes
 
 echo ""
