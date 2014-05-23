@@ -184,7 +184,9 @@ for (suffix in validate_dir){
 }
 
 
-
+#output file \
+flag_file <- paste(dir, "/finish_time.txt", sep="")
+write.table("DONE", flag_file)
 
 
 
