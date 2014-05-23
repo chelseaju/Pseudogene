@@ -42,17 +42,16 @@ echo "Write to $ASSEMBLY"
 echo ""
 echo "Step 2 - Running Cuffmerge"
 echo "cuffmerge -o $CUFFMERGE -g $GTF -s $GENOME $ASSEMBLY"
-#cuffmerge -p 8 -o $CUFFMERGE  -g $GTF -s $GENOME $ASSEMBLY 
+cuffmerge -p 8 -o $CUFFMERGE  -g $GTF -s $GENOME $ASSEMBLY 
 
 ## Step 3: Runing cuffdiff
 echo ""
 echo "Step 3 - Running Cuffdiff"
 echo "cuffdiff -o $CUFFMERGE -b $GENOME -L $SAMPLEA,$SAMPLEB -u $CUFFMERGE/merged.gtf $DIR/$SAMPLEA/$TOPHAT/$BAM $DIR/$SAMPLEB/$TOPHAT/$BAM"
-
-#cuffdiff -p 8 -o $CUFFMERGE -b $GENOME -L $SAMPLEA,$SAMPLEB -u $CUFFMERGE/merged.gtf $DIR/$SAMPLEA/$TOPHAT/$BAM $DIR/$SAMPLEB/$TOPHAT/$BAM
+cuffdiff -p 8 -o $CUFFMERGE -b $GENOME -L $SAMPLEA,$SAMPLEB -u $CUFFMERGE/merged.gtf $DIR/$SAMPLEA/$TOPHAT/$BAM $DIR/$SAMPLEB/$TOPHAT/$BAM
 
 ## Step 4 - Data Preprocessing"
 echo ""
 echo "Step 4 - Preprocessing Data"
-#python cufflink_evaluator_v2.py -d $CUFFMERGE -t isoform -a $DIR/$SAMPLEA/$TOPHAT/genes_expected_read_count.txt -b $DIR/$SAMPLEB/$TOPHAT/genes_expected_read_count.txt
+python cufflink_evaluator_v2.py -d $CUFFMERGE -t isoform -a $DIR/$SAMPLEA/$TOPHAT/transcripts_expected_read_count.txt -b $DIR/$SAMPLEB/$TOPHAT/transcripts_expected_read_count.txt
 

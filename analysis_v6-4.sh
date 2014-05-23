@@ -34,15 +34,15 @@ python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}
 echo ""
 echo "Step 2: Update the Unknonws"
 
-#for subdir in "${EXP[@]}"
-#do
-#	echo ""
-#	echo "Sub-directory ${subdir} ===================="
-#	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
-#	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
-#	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
+for subdir in "${EXP[@]}"
+do
+	echo ""
+	echo "Sub-directory ${subdir} ===================="
+	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
+	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
+	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
 #	rm $subdir/genes_distribution.backup
-#done
+done
 
 
 
