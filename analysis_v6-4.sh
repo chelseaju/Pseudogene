@@ -29,29 +29,29 @@ EXP=( "${EXP[@]/%//$TOPOUT}" )
 echo ""
 echo "Step 1: Unify the Unknowns"
 echo "python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}"
-python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}
+#python unknown_unifier_v2.py -o $DIR -t genes -d ${EXP[@]}
 
 echo ""
 echo "Step 2: Update the Unknonws"
 
-for subdir in "${EXP[@]}"
-do
-	echo ""
-	echo "Sub-directory ${subdir} ===================="
-	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
-	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
-	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
+#for subdir in "${EXP[@]}"
+#do
+#	echo ""
+#	echo "Sub-directory ${subdir} ===================="
+#	python unknown_updator_v2.py -d $DIR -i $subdir/genes_distribution.matrix -t genes
+#	cp $subdir/genes_distribution.matrix $subdir/genes_distribution.backup
+#	R --no-save --slave < unknown_merger_v1.R --args $subdir genes
 #	rm $subdir/genes_distribution.backup
-done
+#done
 
-
+echo "COMPLETE STEP 2" > $DIR"/flag_file.txt"
 
 echo ""
-echo "Step 2: Data examination, check for variance of the distribution matrix"
+echo "Step 3: Data examination, check for variance of the distribution matrix"
 #R --no-save --slave < data_examination_v2.R --args $DIR genes all all 
 
 echo ""
-echo "Step 3: Prepare Data for Lasso"
+echo "Step 4: Prepare Data for Lasso"
 #R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 54
 #R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 50
 #R --no-save --slave < lasso_preparation_v3.R --args $DIR genes 45
@@ -70,7 +70,7 @@ echo "Step 3: Prepare Data for Lasso"
 
 
 echo ""
-echo "Step 3: Training Coefficient with Lasso"
+echo "Step 5: Training Coefficient with Lasso"
 #R --no-save --slave < lasso_trainer.R --args $DIR genes
 
 echo ""
